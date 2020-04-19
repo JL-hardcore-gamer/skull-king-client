@@ -3,7 +3,8 @@ import * as Colyseus from 'colyseus.js';
 import styled from 'styled-components';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-import Login from './Login';
+import SignUp from './SignUp';
+import SignIn from './SignIn';
 import Lobby from './Lobby';
 import cardImg from './card.png';
 import bgImg from './bg-img.jpg';
@@ -162,8 +163,11 @@ const App = () => {
           <Title>Skull King</Title>
         </TitleContainer>
         <Switch>
-          <Route path="/login">
-            <Login />
+          <Route path="/signup">
+            <SignUp />
+          </Route>
+          <Route path="/signin">
+            <SignIn />
           </Route>
 
           <Route path="/game">

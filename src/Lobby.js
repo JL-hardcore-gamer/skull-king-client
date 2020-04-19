@@ -10,6 +10,7 @@ const RoomList = styled.div`
 
 const RoomContainer = styled.div`
   margin: 0 10px;
+  width: 18rem;
 `;
 
 const ActionContainer = styled.div`
@@ -51,11 +52,7 @@ const Lobby = (props) => {
           {availableRooms.map((room, idx) => {
             const date = moment(room.createdAt).format('DD/MM/YY HH:mm:ss');
             return (
-              <RoomContainer
-                key={idx}
-                className="card"
-                style={{ width: '18rem' }}
-              >
+              <RoomContainer key={idx} className="card">
                 <div className="card-body">
                   <h5 className="card-title">Skull King</h5>
                   <h6 className="card-subtitle mb-2 text-muted">{date}</h6>
