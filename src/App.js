@@ -3,6 +3,7 @@ import * as Colyseus from 'colyseus.js';
 import styled from 'styled-components';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
+import NavBar from './NavBar';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import Lobby from './Lobby';
@@ -28,10 +29,12 @@ const SingleCard = styled.img`
 const Root = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 15px;
   background-image: url(${bgImg});
-
   height: 100vh;
+`;
+
+const Content = styled.div`
+  padding: 15px;
 `;
 
 const TitleContainer = styled.div`
@@ -159,24 +162,27 @@ const App = () => {
   return (
     <BrowserRouter>
       <Root>
-        <TitleContainer>
-          <Title>Skull King</Title>
-        </TitleContainer>
-        <Switch>
-          <Route path="/signup">
-            <SignUp />
-          </Route>
-          <Route path="/signin">
-            <SignIn />
-          </Route>
+        <NavBar />
+        <Content>
+          <TitleContainer>
+            <Title>Skull King</Title>
+          </TitleContainer>
+          <Switch>
+            <Route path="/signup">
+              <SignUp />
+            </Route>
+            <Route path="/signin">
+              <SignIn />
+            </Route>
 
-          <Route path="/game">
-            <Game />
-          </Route>
-          <Route path="/">
-            <Lobby client={client} />
-          </Route>
-        </Switch>
+            <Route path="/game">
+              <Game />
+            </Route>
+            <Route path="/">
+              <Lobby client={client} />
+            </Route>
+          </Switch>
+        </Content>
       </Root>
     </BrowserRouter>
   );
