@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import * as Colyseus from 'colyseus.js';
 import styled from 'styled-components';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
+import Login from './Login';
+import Lobby from './Lobby';
 import cardImg from './card.png';
 import bgImg from './bg-img.jpg';
 
@@ -13,18 +15,19 @@ const SingleCard = styled.img`
   height: 96px;
 `;
 
-const cardsPos = [
-  {
-    cardId: '',
-    cardColor: 'Clumb',
-    posX: 0,
-    posY: 0,
-  },
-];
+// const cardsPos = [
+//   {
+//     cardId: '',
+//     cardColor: 'Clumb',
+//     posX: 0,
+//     posY: 0,
+//   },
+// ];
 
 const Root = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 15px;
   background-image: url(${bgImg});
 
   height: 100vh;
@@ -81,36 +84,9 @@ const CardContainer = styled.div`
 
 const client = new Colyseus.Client('ws://localhost:2567');
 
-const App = () => {
-  const [room, setRoom] = useState(null);
-  const [scale, setScale] = useState({ x: 1, y: 1 });
-  useEffect(() => {
-    client
-      .create('arena')
-      .then((room) => {
-        console.log('joined successfully', room);
-        room.onStateChange.once((state) => {
-          console.log('this is the first room state!', state);
-        });
-
-        room.onStateChange((state) => {
-          console.log('the room state has been updated:', state);
-        });
-
-        setRoom(room);
-        room.send({ type: 'PLAY_CARD', test: 'toto' });
-      })
-      .catch((e) => {
-        console.error('join error', e);
-      });
-  }, []);
-
+const Game = () => {
   return (
-    <Root>
-      <TitleContainer>
-        <Title>Skull King</Title>
-      </TitleContainer>
-
+    <>
       <Board>
         <PlayerBoard>
           <PlayerHeader>Ku Yong</PlayerHeader>
@@ -151,7 +127,54 @@ const App = () => {
           <SingleCard src={cardImg} alt="Icons" />
         </CardContainer>
       </PlayerHandContainer>
-    </Root>
+    </>
+  );
+};
+
+const App = () => {
+  const [room, setRoom] = useState(null);
+
+  useEffect(() => {
+    client
+      .create('SkullKing')
+      .then((room) => {
+        console.log('joined successfully', room);
+        room.onStateChange.once((state) => {
+          console.log('this is the first room state!', state);
+        });
+
+        room.onStateChange((state) => {
+          console.log('the room state has been updated:', state);
+        });
+
+        setRoom(room);
+        room.send({ type: 'PLAY_CARD', test: 'toto' });
+      })
+      .catch((e) => {
+        console.error('join error', e);
+      });
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <Root>
+        <TitleContainer>
+          <Title>Skull King</Title>
+        </TitleContainer>
+        <Switch>
+          <Route path="/login">
+            <Login />
+          </Route>
+
+          <Route path="/game">
+            <Game />
+          </Route>
+          <Route path="/">
+            <Lobby client={client} />
+          </Route>
+        </Switch>
+      </Root>
+    </BrowserRouter>
   );
 };
 
