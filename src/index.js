@@ -1,14 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import * as Colyseus from 'colyseus.js';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import * as serviceWorker from './serviceWorker';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import App from './App';
+import reducers from './ducks/reducers';
+import { setClientAction } from './ducks/game';
+
+const composeEnhancers =
+  typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+    : compose;
+
+const enhancer = composeEnhancers();
+const store = createStore(reducers, enhancer);
+
+const client = new Colyseus.Client('ws://localhost:2567');
+store.dispatch(setClientAction(client));
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

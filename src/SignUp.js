@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUserAction } from './ducks/user';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -16,30 +20,67 @@ const ActionContainer = styled.div`
   justify-content: flex-end;
 `;
 
-const Signup = () => {
+const Signup = (props) => {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
+
+  const onSubmit = () => {
+    axios
+      .post('http://localhost:2567/api/signup', {
+        email,
+        nickname,
+      })
+      .then((res) => {
+        const data = res.data;
+        localStorage.setItem('nickname', data.nickname);
+        localStorage.setItem('token', data.token);
+        dispatch(
+          setUserAction({
+            nickname: data.nickname,
+            token: data.token,
+          })
+        );
+        history.push('/');
+      });
+  };
+
   return (
     <LoginContainer>
       <LoginForm className="card">
         <div className="card-header">Création d'un compte</div>
         <div className="card-body">
           <div className="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text">Email</span>
+            <div className="input-group-prepend">
+              <span className="input-group-text">Email</span>
             </div>
-            <input type="email" className="form-control" />
-            <small id="emailHelp" class="form-text text-muted">
-              C'est juste pour générer un compte, on ne vous enverra pas de
-              mail.
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <small id="emailHelp" className="form-text text-muted">
+              C'est juste pour générer un compte, on ne vous enverra pas
+              d'email.
             </small>
           </div>
           <div className="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text">Pseudo</span>
+            <div className="input-group-prepend">
+              <span className="input-group-text">Pseudo</span>
             </div>
-            <input type="text" className="form-control" />
+            <input
+              type="text"
+              className="form-control"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+            />
           </div>
           <ActionContainer>
-            <button className="btn btn-primary">Créer un compte</button>
+            <button className="btn btn-primary" onClick={() => onSubmit()}>
+              Créer un compte
+            </button>
           </ActionContainer>
         </div>
       </LoginForm>

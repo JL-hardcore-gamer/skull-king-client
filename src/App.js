@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import * as Colyseus from 'colyseus.js';
+import React, { useEffect } from 'react';
+
 import styled from 'styled-components';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
@@ -7,8 +7,13 @@ import NavBar from './NavBar';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import Lobby from './Lobby';
+import Room from './Room';
+
+import { setUserAction } from './ducks/user';
+
 import cardImg from './card.png';
 import bgImg from './bg-img.jpg';
+import { useDispatch } from 'react-redux';
 
 const SingleCard = styled.img`
   object-fit: none;
@@ -86,8 +91,6 @@ const CardContainer = styled.div`
   margin: 10px;
 `;
 
-const client = new Colyseus.Client('ws://localhost:2567');
-
 const Game = () => {
   return (
     <>
@@ -136,28 +139,16 @@ const Game = () => {
 };
 
 const App = () => {
-  const [room, setRoom] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    client
-      .create('SkullKing')
-      .then((room) => {
-        console.log('joined successfully', room);
-        room.onStateChange.once((state) => {
-          console.log('this is the first room state!', state);
-        });
+    const nickname = localStorage.getItem('nickname');
+    const token = localStorage.getItem('token');
 
-        room.onStateChange((state) => {
-          console.log('the room state has been updated:', state);
-        });
-
-        setRoom(room);
-        room.send({ type: 'PLAY_CARD', test: 'toto' });
-      })
-      .catch((e) => {
-        console.error('join error', e);
-      });
-  }, []);
+    if (nickname && token) {
+      dispatch(setUserAction({ nickname, token }));
+    }
+  }, [dispatch]);
 
   return (
     <BrowserRouter>
@@ -174,12 +165,14 @@ const App = () => {
             <Route path="/signin">
               <SignIn />
             </Route>
-
+            <Route path="/room/:id">
+              <Room />
+            </Route>
             <Route path="/game">
               <Game />
             </Route>
             <Route path="/">
-              <Lobby client={client} />
+              <Lobby />
             </Route>
           </Switch>
         </Content>
