@@ -28,6 +28,10 @@ const Room = (props) => {
       });
   }, []);
 
+  // console.log('currentRoom', currentRoom.state);
+  const deck = currentRoom.state.game.deck;
+  console.log('deck', deck);
+
   return (
     <RoomContainer className="card">
       <h5 className="card-header">Room</h5>
