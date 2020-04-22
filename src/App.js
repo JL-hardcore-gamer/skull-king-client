@@ -58,10 +58,6 @@ const ProtectedRoute = ({ component: Component, ...props }) => {
 const App = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-<<<<<<< HEAD
-  const serverChecked = useSelector((state) => state.user.serverChecked);
-=======
->>>>>>> 1a2720e3a102f06de9da6301ca8162dfa66a4ec3
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     const token = localStorage.getItem('token');
@@ -100,7 +96,6 @@ const App = () => {
         <TitleContainer>
           <Title>Skull King</Title>
         </TitleContainer>
-        {serverChecked !== null ? (
           <Switch>
             <PublicRoute path="/signup" component={SignUp} />
             <PublicRoute path="/signin" component={SignIn} />
@@ -108,7 +103,6 @@ const App = () => {
             <ProtectedRoute path="/game" component={Game} />
             <ProtectedRoute path="/" component={Lobby} />
           </Switch>
-        ) : null}
       </Content>
     </Root>
   );
