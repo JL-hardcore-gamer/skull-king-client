@@ -3,15 +3,14 @@ import styled from 'styled-components';
 import * as moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  setGameStateAction,
-  setRoomsAction,
-  setCurrentRoom,
-  setPlayers,
-} from './ducks/game';
+import { setRoomsAction, setCurrentRoom, setPlayers } from './ducks/game';
 
 const LobbyContainer = styled.div``;
-
+const LobbyHeader = styled.h5`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 const RoomList = styled.div`
   display: flex;
 `;
@@ -42,7 +41,7 @@ const Lobby = (props) => {
       .catch((e) => {
         console.error(e);
       });
-  }, []);
+  }, [client, dispatch]);
 
   const createRoom = () => {
     client
@@ -85,8 +84,8 @@ const Lobby = (props) => {
 
   return (
     <LobbyContainer className="card">
-      <h5 className="card-header">Lobby</h5>
-      <div className="card-body">
+      <LobbyHeader className="card-header">
+        Lobby
         <ActionContainer>
           <button
             type="button"
@@ -96,7 +95,8 @@ const Lobby = (props) => {
             Créer une table
           </button>
         </ActionContainer>
-
+      </LobbyHeader>
+      <div className="card-body">
         <RoomList>
           {rooms.map((room, idx) => {
             const date = moment(room.createdAt).format('DD/MM/YY HH:mm:ss');

@@ -13,8 +13,8 @@ const Board = styled.div`
 const PlayerBoard = styled.div`
   display: flex;
   flex-direction: column;
-  width: 150px;
-  height: 200px;
+  width: 200px;
+  height: 250px;
   margin: 0 10px;
 
   background-color: rgba(22, 22, 22, 0.2);
@@ -23,9 +23,17 @@ const PlayerBoard = styled.div`
 
 const PlayerHeader = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 5px;
+`;
+
+const PlayerData = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 10px;
 `;
 
 const PlayerCardContainer = styled.div`
@@ -46,14 +54,34 @@ const CardContainer = styled.div`
   margin: 10px;
 `;
 
+const GameStatusMessageContainer = styled.div`
+  margin: 20px;
+`;
+
+const GameStatusMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  font-size: 30px;
+`;
+
 const Game = () => {
   useEffect(() => {}, []);
 
   return (
-    <>
+    <div>
+      <GameStatusMessageContainer>
+        <GameStatusMessage>Pandora_Of_Oz joue une carte</GameStatusMessage>
+      </GameStatusMessageContainer>
+
       <Board>
         <PlayerBoard>
-          <PlayerHeader>Ku Yong</PlayerHeader>
+          <PlayerHeader>
+            <div>Ku Yong</div>
+            <PlayerData>
+              <div>100pt</div>
+              <div>1/5</div>
+            </PlayerData>
+          </PlayerHeader>
           <PlayerCardContainer>
             <Card {...cardList[1]} />
           </PlayerCardContainer>
@@ -77,7 +105,7 @@ const Game = () => {
           </PlayerCardContainer>
         </PlayerBoard>
         <PlayerBoard>
-          <PlayerHeader>Kojima</PlayerHeader>
+          <PlayerHeader>Pandora_Of_Oz</PlayerHeader>
           <PlayerCardContainer>
             <Card {...cardList[10]} />
           </PlayerCardContainer>
@@ -106,7 +134,7 @@ const Game = () => {
           <Card {...cardList[60]} />
         </CardContainer>
       </PlayerHandContainer>
-    </>
+    </div>
   );
 };
 

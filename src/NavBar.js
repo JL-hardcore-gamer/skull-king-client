@@ -17,6 +17,16 @@ const NavBar = (props) => {
         {user && user.nickname ? (
           <>
             <li className="nav-item">
+              <Link className="nav-link" to="/game">
+                Game (dev)
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/assets">
+                Assets (dev)
+              </Link>
+            </li>
+            <li className="nav-item">
               <Link
                 className="nav-link"
                 to="/signin"

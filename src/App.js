@@ -106,6 +106,7 @@ const App = () => {
           <ProtectedRoute path="/room/:id" component={Room} />
           <ProtectedRoute path="/assets" component={Assets} />
           <ProtectedRoute path="/game" component={Game} />
+          <ProtectedRoute path="/game/:id" component={Game} />
           <ProtectedRoute path="/" component={Lobby} />
         </Switch>
       </Content>

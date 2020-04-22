@@ -14,6 +14,8 @@ const GeneratedCard = styled.div`
 const CardTitle = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
+  vertical-align: middle;
   margin-top: 5px;
 `;
 

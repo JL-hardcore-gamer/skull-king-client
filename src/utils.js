@@ -10,7 +10,7 @@ const specialCards = [
     id: 53,
     type: 'purple',
     color: '#9c27b0',
-    value: 'Skull King',
+    value: 'JL King',
     icon1: 'fa-chess-king',
     icon2: null,
   },
