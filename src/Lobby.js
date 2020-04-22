@@ -58,6 +58,7 @@ const Lobby = (props) => {
         dispatch(setCurrentRoom(room));
 
         history.push(`/room/${room.id}`);
+        room.send("hello"); // test Juliette - à retirer
       })
       .catch((e) => {
         console.error('creation or join error', e);
