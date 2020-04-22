@@ -53,7 +53,7 @@ const ProtectedRoute = ({ component: Component, ...props }) => {
 const App = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-
+  const serverChecked = useSelector((state) => state.user.serverChecked);
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     const token = localStorage.getItem('token');
@@ -92,13 +92,15 @@ const App = () => {
         <TitleContainer>
           <Title>Skull King</Title>
         </TitleContainer>
-        <Switch>
-          <PublicRoute path="/signup" component={SignUp} />
-          <PublicRoute path="/signin" component={SignIn} />
-          <ProtectedRoute path="/room/:id" component={Room} />
-          <ProtectedRoute path="/game" component={Game} />
-          <ProtectedRoute path="/" component={Lobby} />
-        </Switch>
+        {serverChecked !== null ? (
+          <Switch>
+            <PublicRoute path="/signup" component={SignUp} />
+            <PublicRoute path="/signin" component={SignIn} />
+            <ProtectedRoute path="/room/:id" component={Room} />
+            <ProtectedRoute path="/game" component={Game} />
+            <ProtectedRoute path="/" component={Lobby} />
+          </Switch>
+        ) : null}
       </Content>
     </Root>
   );
