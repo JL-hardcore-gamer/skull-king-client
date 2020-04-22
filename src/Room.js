@@ -29,9 +29,9 @@ const Room = (props) => {
   }, []);
 
   // console.log('currentRoom', currentRoom.state);
-  const deck = currentRoom.state.game.deck;
-  console.log('deck', deck);
-  console.log('players:', players);
+  // const deck = currentRoom.state.game.deck;
+  // console.log('deck', deck);
+  // console.log('players:', players);
 
   return (
     <RoomContainer className="card">
