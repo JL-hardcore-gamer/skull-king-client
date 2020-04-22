@@ -1,0 +1,3 @@
+const cardList = [];
+
+const generateCardList = () => {};
