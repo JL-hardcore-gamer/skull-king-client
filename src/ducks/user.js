@@ -11,7 +11,7 @@ export const setUserServerCheckedAction = (serverChecked) => {
 
 const defaultState = {
   data: null,
-  serverChecked: false,
+  serverChecked: null,
 };
 
 export default function reducer(state = defaultState, action = {}) {

@@ -37,7 +37,14 @@ const Room = (props) => {
       <h5 className="card-header">Room</h5>
 
       <div className="card-body">
-        <button className="btn btn-primary">Lancer la partie</button>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            currentRoom.send({ type: 'START_GAME' });
+          }}
+        >
+          Lancer la partie
+        </button>
         <PlayerList>
           {players.map((player, idx) => {
             return (
