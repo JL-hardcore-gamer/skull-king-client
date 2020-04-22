@@ -44,13 +44,8 @@ const PublicRoute = ({ component: Component, ...props }) => {
 const ProtectedRoute = ({ component: Component, ...props }) => {
   const serverChecked = useSelector((state) => state.user.serverChecked);
   if (serverChecked) {
-    // The user is correct
     return <Route {...props} render={(props) => <Component {...props} />} />;
-  } else if (serverChecked === null) {
-    // We don't know if the user is correct
-    return <div>Loading...</div>;
   } else {
-    // The user is incorrect
     return <Redirect to="/signin" />;
   }
 };
@@ -58,10 +53,7 @@ const ProtectedRoute = ({ component: Component, ...props }) => {
 const App = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-<<<<<<< HEAD
   const serverChecked = useSelector((state) => state.user.serverChecked);
-=======
->>>>>>> 1a2720e3a102f06de9da6301ca8162dfa66a4ec3
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     const token = localStorage.getItem('token');
