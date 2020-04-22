@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { setUserAction } from './ducks/user';
+import { setUserAction, setUserServerCheckedAction } from './ducks/user';
 
 const NavBar = (props) => {
   const user = useSelector((state) => state.user.data);
@@ -22,6 +22,8 @@ const NavBar = (props) => {
                 to="/signin"
                 onClick={() => {
                   dispatch(setUserAction(null));
+                  dispatch(setUserServerCheckedAction(false));
+                  localStorage.clear();
                 }}
               >
                 Déconnexion

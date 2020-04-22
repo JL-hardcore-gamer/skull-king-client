@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-
+import axios from 'axios';
 import styled from 'styled-components';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 
 import NavBar from './NavBar';
 import SignUp from './SignUp';
@@ -9,10 +9,10 @@ import SignIn from './SignIn';
 import Lobby from './Lobby';
 import Room from './Room';
 import Game from './Game';
-import { setUserAction } from './ducks/user';
+import { setUserAction, setUserServerCheckedAction } from './ducks/user';
 
 import bgImg from './bg-img.jpg';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Root = styled.div`
   display: flex;
@@ -32,46 +32,75 @@ const TitleContainer = styled.div`
 `;
 const Title = styled.h2``;
 
+const PublicRoute = ({ component: Component, ...props }) => {
+  const serverChecked = useSelector((state) => state.user.serverChecked);
+  if (!serverChecked) {
+    return <Route {...props} render={(props) => <Component {...props} />} />;
+  } else {
+    return <Redirect to="/" />;
+  }
+};
+
+const ProtectedRoute = ({ component: Component, ...props }) => {
+  const serverChecked = useSelector((state) => state.user.serverChecked);
+  if (serverChecked) {
+    return <Route {...props} render={(props) => <Component {...props} />} />;
+  } else {
+    return <Redirect to="/signin" />;
+  }
+};
+
 const App = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     const token = localStorage.getItem('token');
 
+    // Check if user correct
     if (nickname && token) {
-      dispatch(setUserAction({ nickname, token }));
+      axios
+        .post('http://localhost:2567/api/check-user', {
+          nickname,
+          token,
+        })
+        .then((res) => {
+          const { nickname, token } = res.data;
+          dispatch(
+            setUserAction({
+              nickname,
+              token,
+            })
+          );
+          dispatch(setUserServerCheckedAction(true));
+        })
+        .catch((e) => {
+          dispatch(setUserAction(null));
+          dispatch(setUserServerCheckedAction(false));
+          localStorage.clear();
+          history.push('/signin');
+          console.log('error', e.response);
+        });
     }
-  }, [dispatch]);
+  }, [dispatch, history]);
 
   return (
-    <BrowserRouter>
-      <Root>
-        <NavBar />
-        <Content>
-          <TitleContainer>
-            <Title>Skull King</Title>
-          </TitleContainer>
-          <Switch>
-            <Route path="/signup">
-              <SignUp />
-            </Route>
-            <Route path="/signin">
-              <SignIn />
-            </Route>
-            <Route path="/room/:id">
-              <Room />
-            </Route>
-            <Route path="/game">
-              <Game />
-            </Route>
-            <Route path="/">
-              <Lobby />
-            </Route>
-          </Switch>
-        </Content>
-      </Root>
-    </BrowserRouter>
+    <Root>
+      <NavBar />
+      <Content>
+        <TitleContainer>
+          <Title>Skull King</Title>
+        </TitleContainer>
+        <Switch>
+          <PublicRoute path="/signup" component={SignUp} />
+          <PublicRoute path="/signin" component={SignIn} />
+          <ProtectedRoute path="/room/:id" component={Room} />
+          <ProtectedRoute path="/game" component={Game} />
+          <ProtectedRoute path="/" component={Lobby} />
+        </Switch>
+      </Content>
+    </Root>
   );
 };
 

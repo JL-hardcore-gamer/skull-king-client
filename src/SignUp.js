@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setUserAction } from './ducks/user';
+import { setUserAction, setUserServerCheckedAction } from './ducks/user';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -42,6 +42,7 @@ const Signup = (props) => {
             token: data.token,
           })
         );
+        dispatch(setUserServerCheckedAction(true));
         history.push('/');
       });
   };
