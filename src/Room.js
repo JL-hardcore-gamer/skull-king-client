@@ -56,6 +56,11 @@ const Room = (props) => {
       .catch((e) => {
         console.error(e);
       });
+
+    currentRoom.onMessage('GAME_STATE', (message) => {
+      console.log('message received from server');
+      console.log(message);
+    });
   }, [client, dispatch]);
 
   return (
@@ -68,7 +73,8 @@ const Room = (props) => {
             // Uncomment this after test
             // disabled={players.length <= 2}
             onClick={() => {
-              currentRoom.send({ type: 'START_GAME' });
+              currentRoom.send('START_GAME', { message: 'hey' });
+              currentRoom.send('TEST', { message: 'TEST' });
               history.push('/game');
             }}
           >

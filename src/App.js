@@ -11,7 +11,6 @@ import Room from './Room';
 import Game from './Game';
 import Assets from './Assets';
 import { setUserAction, setUserServerCheckedAction } from './ducks/user';
-import { cardList } from './utils';
 
 import bgImg from './bg-img.jpg';
 import { useDispatch, useSelector } from 'react-redux';
@@ -88,9 +87,9 @@ const App = () => {
           history.push('/signin');
           console.log('error', e.response);
         });
+    } else {
+      history.push('/signin');
     }
-
-    console.log('cardList', cardList);
   }, [dispatch, history]);
 
   return (

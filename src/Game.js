@@ -78,8 +78,14 @@ const Game = () => {
         console.log('round', round);
         console.log('i', i);
         console.log('card', round.playersHand['MonPote'].hand[0]);
+
         // Got the card
       };
+
+      currentRoom.onMessage((message) => {
+        console.log('message received from server');
+        console.log(message);
+      });
     }
   }, []);
 
