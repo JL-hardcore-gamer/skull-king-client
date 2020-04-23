@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import Card from './Card';
@@ -65,7 +66,35 @@ const GameStatusMessage = styled.div`
 `;
 
 const Game = () => {
-  useEffect(() => {}, []);
+  const currentRoom = useSelector((state) => state.game.currentRoom);
+  const players = useSelector((state) => state.game.players);
+
+  useEffect(() => {
+    // Setup the room
+    console.log('currentRoom', currentRoom);
+    if (currentRoom) {
+      // currentRoom.state.game.remainingRounds[0].playersHand['MonPote'].hand[0]
+      currentRoom.state.game.remainingRounds.onAdd = (round, i) => {
+        console.log('round', round);
+        console.log('i', i);
+        console.log('card', round.playersHand['MonPote'].hand[0]);
+        // Got the card
+      };
+    }
+  }, []);
+
+  if (
+    currentRoom &&
+    currentRoom.state.game &&
+    currentRoom.state.game.remainingRounds[0] &&
+    currentRoom.state.game.remainingRounds[0].playersHand['MonPote'] &&
+    currentRoom.state.game.remainingRounds[0].playersHand['MonPote'].hand[0]
+  ) {
+    console.log(
+      'hand',
+      currentRoom.state.game.remainingRounds[0].playersHand['MonPote'].hand[0]
+    );
+  }
 
   return (
     <div>

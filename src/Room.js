@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-// import { useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { setRoomsAction } from './ducks/game';
@@ -43,10 +43,7 @@ const PlayerIcon = styled.div`
 const Room = (props) => {
   const client = useSelector((state) => state.game.client);
   const dispatch = useDispatch();
-  // let { id } = useParams();
-  // const rooms = useSelector((state) => state.game.rooms);
-  // const gameState = useSelector((state) => state.game.state);
-  // const currentRoom = rooms.find(room => )
+  const history = useHistory();
   const currentRoom = useSelector((state) => state.game.currentRoom);
   const players = useSelector((state) => state.game.players);
 
@@ -61,11 +58,6 @@ const Room = (props) => {
       });
   }, [client, dispatch]);
 
-  // console.log('currentRoom', currentRoom.state);
-  // const deck = currentRoom.state.game.deck;
-  // console.log('deck', deck);
-  // console.log('players:', players);
-
   return (
     <RoomContainer className="card">
       <RoomHeader className="card-header">
@@ -73,9 +65,11 @@ const Room = (props) => {
         <ActionContainer>
           <button
             className="btn btn-primary"
-            disabled={players.length <= 2}
+            // Uncomment this after test
+            // disabled={players.length <= 2}
             onClick={() => {
               currentRoom.send({ type: 'START_GAME' });
+              history.push('/game');
             }}
           >
             Lancer la partie
