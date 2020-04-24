@@ -62,7 +62,7 @@ const Room = (props) => {
       console.log('message received from server');
       console.log(message);
     });
-  }, [client, dispatch]);
+  }, [client, currentRoom, dispatch]);
 
   return (
     <RoomContainer className="card">

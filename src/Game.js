@@ -77,8 +77,17 @@ const Game = () => {
   const currentRoom = useSelector((state) => state.game.currentRoom);
   const players = useSelector((state) => state.game.players);
   const [playerHand, setPlayerHand] = useState([]);
-  // null => Not Betting
-  const [maxBet, setMaxBet] = useState(null);
+
+  /**
+   * FIXME Change to null after test
+   */
+
+  const [maxBet, setMaxBet] = useState(5);
+  const [playerBet, setPlayerBet] = useState(1);
+
+  const [gameMessage, setGameMessage] = useState(
+    'Pandora_Of_Oz joue une carte'
+  );
 
   useEffect(() => {
     // Setup the room
@@ -99,38 +108,53 @@ const Game = () => {
       currentRoom.onMessage('START_BETTING', (message) => {
         setMaxBet(message.maxBet);
       });
+
+      currentRoom.onMessage('GENERAL_MESSAGE', (message) => {
+        setGameMessage(message);
+      });
     } else {
       // Error the logic has not been implemented
     }
   }, []);
 
-  if (
-    currentRoom &&
-    currentRoom.state.game &&
-    currentRoom.state.game.remainingRounds[0] &&
-    currentRoom.state.game.remainingRounds[0].playersHand['MonPote'] &&
-    currentRoom.state.game.remainingRounds[0].playersHand['MonPote'].hand[0]
-  ) {
-    console.log(
-      'hand',
-      currentRoom.state.game.remainingRounds[0].playersHand['MonPote'].hand[0]
-    );
-  }
+  const isCorrectBet =
+    playerBet !== null &&
+    maxBet != null &&
+    playerBet >= 0 &&
+    playerBet <= maxBet;
 
   return (
     <div>
-      <GameStatusMessageContainer>
-        <GameStatusMessage>Pandora_Of_Oz joue une carte</GameStatusMessage>
-      </GameStatusMessageContainer>
-      {maxBet === null ? (
+      {gameMessage !== null ? (
+        <GameStatusMessageContainer>
+          <GameStatusMessage>{gameMessage}</GameStatusMessage>
+        </GameStatusMessageContainer>
+      ) : null}
+
+      {maxBet !== null ? (
         <GameStatusMessageContainer>
           <GameBet className="input-group">
             <div className="input-group-prepend">
               <span className="input-group-text">Nombre de plis</span>
             </div>
-            <input type="number" className="form-control" min="0" max="5" />
+            <input
+              type="number"
+              className="form-control"
+              min="0"
+              max="5"
+              onChange={(e) => {
+                setPlayerBet(parseInt(e.target.value));
+              }}
+            />
             <div className="input-group-append">
-              <button type="button" className="btn btn-primary">
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={!isCorrectBet}
+                onClick={() => {
+                  currentRoom.send('BET', { value: playerBet });
+                }}
+              >
                 Prêt à Yo-Ho-Ho
               </button>
             </div>
