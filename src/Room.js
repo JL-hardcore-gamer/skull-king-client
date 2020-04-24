@@ -57,6 +57,7 @@ const Room = (props) => {
         console.error(e);
       });
 
+    // FIXME
     currentRoom.onMessage('GAME_STATE', (message) => {
       console.log('message received from server');
       console.log(message);

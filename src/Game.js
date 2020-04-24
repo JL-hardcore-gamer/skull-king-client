@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -68,6 +68,7 @@ const GameStatusMessage = styled.div`
 const Game = () => {
   const currentRoom = useSelector((state) => state.game.currentRoom);
   const players = useSelector((state) => state.game.players);
+  const [playerHand, setPlayerHand] = useState([]);
 
   useEffect(() => {
     // Setup the room
@@ -77,7 +78,10 @@ const Game = () => {
       currentRoom.state.game.remainingRounds.onAdd = (round, i) => {
         console.log('round', round);
         console.log('i', i);
-        console.log('card', round.playersHand['MonPote'].hand[0]);
+
+        // console.log('card', round.playersHand['MonPote'].hand[0]);
+        // console.log('hands', );
+        setPlayerHand(round.playersHand['MonPote'].hand);
 
         // Got the card
       };
@@ -153,21 +157,14 @@ const Game = () => {
         </PlayerBoard>
       </Board>
       <PlayerHandContainer>
-        <CardContainer>
-          <Card {...cardList[12]} />
-        </CardContainer>
-        <CardContainer>
-          <Card {...cardList[34]} />
-        </CardContainer>
-        <CardContainer>
-          <Card {...cardList[23]} />
-        </CardContainer>
-        <CardContainer>
-          <Card {...cardList[56]} />
-        </CardContainer>
-        <CardContainer style={{ opacity: 0.5 }}>
-          <Card {...cardList[60]} />
-        </CardContainer>
+        {playerHand.map((card, idx) => {
+          const cardData = cardList.find((c) => c.id === card.id);
+          return (
+            <CardContainer key={idx}>
+              <Card {...cardData} />
+            </CardContainer>
+          );
+        })}
       </PlayerHandContainer>
     </div>
   );
