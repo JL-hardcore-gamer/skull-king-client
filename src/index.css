@@ -11,3 +11,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@font-face {
+  font-family: 'Chomsky';
+  src: local('MyFont'), url(./fonts/Chomsky.woff) format('woff');
+}

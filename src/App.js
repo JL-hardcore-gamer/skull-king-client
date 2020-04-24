@@ -31,7 +31,10 @@ const TitleContainer = styled.div`
   align-items: center;
   justify-content: center;
 `;
-const Title = styled.h2``;
+const Title = styled.div`
+  font-family: 'Chomsky';
+  font-size: 4rem;
+`;
 
 const PublicRoute = ({ component: Component, ...props }) => {
   const serverChecked = useSelector((state) => state.user.serverChecked);
@@ -97,7 +100,7 @@ const App = () => {
       <NavBar />
       <Content>
         <TitleContainer>
-          <Title>Skull King</Title>
+          <Title>Jean Luc King</Title>
         </TitleContainer>
         <Switch>
           <PublicRoute path="/signup" component={SignUp} />
