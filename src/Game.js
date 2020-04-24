@@ -56,40 +56,51 @@ const CardContainer = styled.div`
 `;
 
 const GameStatusMessageContainer = styled.div`
+  display: flex;
+  justify-content: center;
   margin: 20px;
 `;
 
 const GameStatusMessage = styled.div`
   display: flex;
-  justify-content: center;
+  /* justify-content: center; */
   font-size: 30px;
+`;
+
+const GameBet = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 500px;
 `;
 
 const Game = () => {
   const currentRoom = useSelector((state) => state.game.currentRoom);
   const players = useSelector((state) => state.game.players);
   const [playerHand, setPlayerHand] = useState([]);
+  // null => Not Betting
+  const [maxBet, setMaxBet] = useState(null);
 
   useEffect(() => {
     // Setup the room
     console.log('currentRoom', currentRoom);
     if (currentRoom) {
-      // currentRoom.state.game.remainingRounds[0].playersHand['MonPote'].hand[0]
       currentRoom.state.game.remainingRounds.onAdd = (round, i) => {
+        // FIXME to improve
         console.log('round', round);
         console.log('i', i);
 
-        // console.log('card', round.playersHand['MonPote'].hand[0]);
-        // console.log('hands', );
         setPlayerHand(round.playersHand['MonPote'].hand);
-
-        // Got the card
       };
 
-      currentRoom.onMessage((message) => {
-        console.log('message received from server');
-        console.log(message);
+      currentRoom.state.game.remainingRounds.onRemove = (round, i) => {
+        // Do something
+      };
+
+      currentRoom.onMessage('START_BETTING', (message) => {
+        setMaxBet(message.maxBet);
       });
+    } else {
+      // Error the logic has not been implemented
     }
   }, []);
 
@@ -111,6 +122,21 @@ const Game = () => {
       <GameStatusMessageContainer>
         <GameStatusMessage>Pandora_Of_Oz joue une carte</GameStatusMessage>
       </GameStatusMessageContainer>
+      {maxBet === null ? (
+        <GameStatusMessageContainer>
+          <GameBet className="input-group">
+            <div className="input-group-prepend">
+              <span className="input-group-text">Nombre de plis</span>
+            </div>
+            <input type="number" className="form-control" min="0" max="5" />
+            <div className="input-group-append">
+              <button type="button" className="btn btn-primary">
+                Prêt à Yo-Ho-Ho
+              </button>
+            </div>
+          </GameBet>
+        </GameStatusMessageContainer>
+      ) : null}
 
       <Board>
         <PlayerBoard>
