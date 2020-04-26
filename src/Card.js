@@ -1,6 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
+export const CURSOR_NORMAL = 'NORMAL';
+export const CURSOR_CLICKABLE = 'CLICKABLE';
+export const CURSOR_DISABLE = 'DISABLE';
+
 const GeneratedCard = styled.div`
   display: flex;
   flex-direction: column;
@@ -9,6 +13,7 @@ const GeneratedCard = styled.div`
   border-radius: 5px;
   border: 1px solid grey;
   background-color: ${({ bgColor }) => bgColor};
+  cursor: ${({ cursor }) => cursor};
 `;
 
 const CardTitle = styled.div`
@@ -30,7 +35,7 @@ const CardNumber = styled.span`
   font-size: 30px;
 `;
 
-const Card = ({ type, color, value, icon1, icon2 }) => {
+const Card = ({ type, color, value, icon1, icon2, cursor }) => {
   let cardContent = null;
   switch (type) {
     case 'red':
@@ -78,7 +83,27 @@ const Card = ({ type, color, value, icon1, icon2 }) => {
       );
   }
 
-  return <GeneratedCard bgColor={color}>{cardContent}</GeneratedCard>;
+  let cursorState;
+
+  switch (cursor) {
+    case CURSOR_NORMAL:
+      cursorState = 'default';
+      break;
+    case CURSOR_CLICKABLE:
+      cursorState = 'pointer';
+      break;
+    case CURSOR_DISABLE:
+      cursorState = 'not-allowed';
+      break;
+    default:
+      cursorState = 'default';
+  }
+
+  return (
+    <GeneratedCard bgColor={color} cursor={cursorState}>
+      {cardContent}
+    </GeneratedCard>
+  );
 };
 
 export default Card;

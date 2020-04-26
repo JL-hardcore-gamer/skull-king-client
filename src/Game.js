@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import Card from './Card';
+import Card, { CURSOR_NORMAL, CURSOR_CLICKABLE, CURSOR_DISABLE } from './Card';
 import { cardList } from './utils';
+import { addRoundAction } from './ducks/game';
 
 const Board = styled.div`
   display: flex;
@@ -55,6 +56,15 @@ const CardContainer = styled.div`
   margin: 10px;
 `;
 
+const GameStateInfoContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const GameStateInfo = styled.div`
+  font-size: 30px;
+`;
+
 const GameStatusMessageContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -63,8 +73,7 @@ const GameStatusMessageContainer = styled.div`
 
 const GameStatusMessage = styled.div`
   display: flex;
-  /* justify-content: center; */
-  font-size: 30px;
+  font-size: 20px;
 `;
 
 const GameBet = styled.div`
@@ -74,9 +83,18 @@ const GameBet = styled.div`
 `;
 
 const Game = () => {
+  const dispatch = useDispatch();
+  const userName = useSelector((state) => state.user.data.nickname);
   const currentRoom = useSelector((state) => state.game.currentRoom);
   const players = useSelector((state) => state.game.players);
+  const rounds = useSelector((state) => state.game.rounds);
+
   const [playerHand, setPlayerHand] = useState([]);
+  const [allowedCards, setAllowedCards] = useState([]);
+  const [startingPlayer, setStartingPlayer] = useState(null);
+  const [firstPlayer, setFirstPlayer] = useState(null);
+  // Should be set after a message
+  const [currentRound, setCurrentRound] = useState(0);
 
   /**
    * FIXME Change to null after test
@@ -90,23 +108,47 @@ const Game = () => {
   );
 
   useEffect(() => {
-    // Setup the room
-    console.log('currentRoom', currentRoom);
-    if (currentRoom) {
-      currentRoom.state.game.remainingRounds.onAdd = (round, i) => {
-        // FIXME to improve
-        console.log('round', round);
-        console.log('i', i);
+    if (rounds.length > 0) {
+      setPlayerHand(rounds[currentRound].hand);
+    }
+  }, [currentRound, rounds]);
 
-        setPlayerHand(round.playersHand['MonPote'].hand);
+  useEffect(() => {
+    // Setup the room
+
+    if (currentRoom) {
+      currentRoom.state.game.remainingRounds.onAdd = (round, key) => {
+        const currentPlayer = players.find(
+          (player) => player.name === userName
+        );
+
+        const newRound = {
+          id: round.id,
+          hand: round.playersHand[currentPlayer.id].hand,
+        };
+
+        dispatch(addRoundAction(newRound));
       };
 
       currentRoom.state.game.remainingRounds.onRemove = (round, i) => {
         // Do something
       };
 
+      currentRoom.state.onChange = (changes) => {
+        changes.forEach((change) => {
+          const { field, value } = change;
+          if (field === 'startingPlayer') {
+            setStartingPlayer(value);
+          }
+          if (field === 'firstPlayer') {
+            setFirstPlayer(value);
+          }
+        });
+      };
+
       currentRoom.onMessage('START_BETTING', (message) => {
         setMaxBet(message.maxBet);
+        console.log('message.maxBet', message.maxBet);
       });
 
       currentRoom.onMessage('GENERAL_MESSAGE', (message) => {
@@ -115,7 +157,7 @@ const Game = () => {
     } else {
       // Error the logic has not been implemented
     }
-  }, []);
+  }, [currentRoom, dispatch, players, userName]);
 
   const isCorrectBet =
     playerBet !== null &&
@@ -125,6 +167,9 @@ const Game = () => {
 
   return (
     <div>
+      <GameStateInfoContainer>
+        <GameStateInfo>Round 1</GameStateInfo>
+      </GameStateInfoContainer>
       {gameMessage !== null ? (
         <GameStatusMessageContainer>
           <GameStatusMessage>{gameMessage}</GameStatusMessage>
@@ -172,7 +217,7 @@ const Game = () => {
             </PlayerData>
           </PlayerHeader>
           <PlayerCardContainer>
-            <Card {...cardList[1]} />
+            <Card {...cardList[1]} cursor={CURSOR_CLICKABLE} />
           </PlayerCardContainer>
         </PlayerBoard>
         <PlayerBoard>

@@ -3,6 +3,7 @@ const SET_ROOMS = 'SET_ROOMS';
 const SET_GAME_STATE = 'SET_GAME_STATE';
 const SET_CURRENT_ROOM = 'SET_CURRENT_ROOM';
 const SET_PLAYERS = 'SET_PLAYERS';
+const ADD_ROUND = 'ADD_ROUND';
 
 export const setClientAction = (client) => {
   return { type: SET_CLIENT, payload: client };
@@ -24,12 +25,17 @@ export const setPlayers = (players) => {
   return { type: SET_PLAYERS, payload: players };
 };
 
+export const addRoundAction = (newRound) => {
+  return { type: ADD_ROUND, payload: newRound };
+};
+
 const defaultState = {
   client: null,
   rooms: [],
   state: {},
   currentRoom: null,
   players: [],
+  rounds: [],
 };
 
 export default function reducer(state = defaultState, action = {}) {
@@ -58,6 +64,11 @@ export default function reducer(state = defaultState, action = {}) {
       return {
         ...state,
         players: [...state.players, action.payload],
+      };
+    case ADD_ROUND:
+      return {
+        ...state,
+        rounds: [...state.rounds, action.payload],
       };
     default:
       return state;

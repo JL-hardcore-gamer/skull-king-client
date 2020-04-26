@@ -62,7 +62,11 @@ const Room = (props) => {
       console.log('message received from server');
       console.log(message);
     });
-  }, [client, currentRoom, dispatch]);
+
+    currentRoom.onMessage('GAME_STARTED', (message) => {
+      history.push('/game');
+    });
+  }, [client, currentRoom, dispatch, history]);
 
   return (
     <RoomContainer className="card">
