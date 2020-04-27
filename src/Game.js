@@ -255,7 +255,13 @@ const Game = () => {
         {playerHand.map((card, idx) => {
           const cardData = cardList.find((c) => c.id === card.id);
           return (
-            <CardContainer key={idx}>
+            <CardContainer
+              key={idx}
+              onClick={() => {
+                console.log('click click');
+                currentRoom.send('BET', { value: cardData.id });
+              }}
+            >
               <Card {...cardData} />
             </CardContainer>
           );
