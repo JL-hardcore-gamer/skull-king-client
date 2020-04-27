@@ -259,7 +259,7 @@ const Game = () => {
               key={idx}
               onClick={() => {
                 console.log('click click');
-                currentRoom.send('BET', { value: cardData.id });
+                currentRoom.send('PLAY_CARD', { value: cardData.id });
               }}
             >
               <Card {...cardData} />
