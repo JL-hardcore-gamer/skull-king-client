@@ -100,7 +100,7 @@ const Game = () => {
    * FIXME Change to null after test
    */
 
-  const [maxBet, setMaxBet] = useState(5);
+  const [maxBet, setMaxBet] = useState(-1);
   const [playerBet, setPlayerBet] = useState(1);
 
   const [gameMessage, setGameMessage] = useState(
@@ -148,10 +148,14 @@ const Game = () => {
 
       currentRoom.onMessage('START_BETTING', (message) => {
         setMaxBet(message.maxBet);
-        console.log('message.maxBet', message.maxBet);
+        setGameMessage(message.topMessage);
       });
 
-      currentRoom.onMessage('GENERAL_MESSAGE', (message) => {
+      currentRoom.onMessage('START_ROUND', (message) => {
+        console.log('START_ROUND', message);
+      });
+
+      currentRoom.onMessage('TOP_MESSAGE', (message) => {
         setGameMessage(message);
       });
     } else {
@@ -165,6 +169,9 @@ const Game = () => {
     playerBet >= 0 &&
     playerBet <= maxBet;
 
+  // console.log('players', players);
+  console.log('playerHand', playerHand);
+
   return (
     <div>
       <GameStateInfoContainer>
@@ -176,7 +183,7 @@ const Game = () => {
         </GameStatusMessageContainer>
       ) : null}
 
-      {maxBet !== null ? (
+      {maxBet !== -1 ? (
         <GameStatusMessageContainer>
           <GameBet className="input-group">
             <div className="input-group-prepend">
@@ -198,6 +205,7 @@ const Game = () => {
                 disabled={!isCorrectBet}
                 onClick={() => {
                   currentRoom.send('BET', { value: playerBet });
+                  setMaxBet(-1);
                 }}
               >
                 Prêt à Yo-Ho-Ho
@@ -208,19 +216,24 @@ const Game = () => {
       ) : null}
 
       <Board>
-        <PlayerBoard>
-          <PlayerHeader>
-            <div>Ku Yong</div>
-            <PlayerData>
-              <div>100pt</div>
-              <div>1/5</div>
-            </PlayerData>
-          </PlayerHeader>
-          <PlayerCardContainer>
-            <Card {...cardList[1]} cursor={CURSOR_CLICKABLE} />
-          </PlayerCardContainer>
-        </PlayerBoard>
-        <PlayerBoard>
+        {players.map((player, idx) => {
+          return (
+            <PlayerBoard key={idx}>
+              <PlayerHeader>
+                <div>{player.name}</div>
+                <PlayerData>
+                  <div>100pt</div>
+                  <div>1/5</div>
+                </PlayerData>
+              </PlayerHeader>
+              <PlayerCardContainer>
+                {/* <Card {...cardList[1]} cursor={CURSOR_CLICKABLE} /> */}
+              </PlayerCardContainer>
+            </PlayerBoard>
+          );
+        })}
+
+        {/* <PlayerBoard>
           <PlayerHeader>Julien B79</PlayerHeader>
           <PlayerCardContainer>
             <Card {...cardList[2]} />
@@ -249,7 +262,7 @@ const Game = () => {
           <PlayerCardContainer>
             <Card {...cardList[0]} />
           </PlayerCardContainer>
-        </PlayerBoard>
+        </PlayerBoard> */}
       </Board>
       <PlayerHandContainer>
         {playerHand.map((card, idx) => {
