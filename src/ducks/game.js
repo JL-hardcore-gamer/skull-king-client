@@ -4,6 +4,7 @@ const SET_GAME_STATE = 'SET_GAME_STATE';
 const SET_CURRENT_ROOM = 'SET_CURRENT_ROOM';
 const SET_PLAYERS = 'SET_PLAYERS';
 const ADD_ROUND = 'ADD_ROUND';
+const ADD_PLAYED_CARD = 'ADD_PLAYED_CARD';
 
 export const setClientAction = (client) => {
   return { type: SET_CLIENT, payload: client };
@@ -29,6 +30,10 @@ export const addRoundAction = (newRound) => {
   return { type: ADD_ROUND, payload: newRound };
 };
 
+export const addPlayedCardAction = (newPlayedCard) => {
+  return { type: ADD_PLAYED_CARD, payload: newPlayedCard };
+};
+
 const defaultState = {
   client: null,
   rooms: [],
@@ -36,6 +41,7 @@ const defaultState = {
   currentRoom: null,
   players: [],
   rounds: [],
+  currentTrickPlayedCard: [],
 };
 
 export default function reducer(state = defaultState, action = {}) {
@@ -69,6 +75,14 @@ export default function reducer(state = defaultState, action = {}) {
       return {
         ...state,
         rounds: [...state.rounds, action.payload],
+      };
+    case ADD_PLAYED_CARD:
+      return {
+        ...state,
+        currentTrickPlayedCard: [
+          ...state.currentTrickPlayedCard,
+          action.payload,
+        ],
       };
     default:
       return state;

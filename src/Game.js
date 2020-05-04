@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import Card, { CURSOR_NORMAL, CURSOR_CLICKABLE, CURSOR_DISABLE } from './Card';
 import { cardList } from './utils';
-import { addRoundAction } from './ducks/game';
+import { addRoundAction, addPlayedCardAction } from './ducks/game';
 
 const Board = styled.div`
   display: flex;
@@ -97,6 +97,14 @@ const Game = () => {
   const [currentRound, setCurrentRound] = useState(0);
   const [currentPlayerId, setCurrentPlayerId] = useState(-1);
 
+  const [currentTrick, setCurrentTrick] = useState(null);
+  // const [playersPlayedCard, setPlayersPlayedCard] = useState([]);
+
+  const playersPlayedCard = useSelector(
+    (state) => state.game.currentTrickPlayedCard
+  );
+  console.log('external', playersPlayedCard);
+
   /**
    * FIXME Change to null after test
    */
@@ -123,6 +131,13 @@ const Game = () => {
           (player) => player.name === userName
         );
 
+        round.playersHand[currentPlayer.id].hand.onRemove = (card, key) => {
+          // Add checking ?
+          // What happen when we have several rounds ?
+          let newPlayerHand = playerHand.filter((card, idx) => idx !== key);
+          setPlayerHand(newPlayerHand);
+        };
+
         const newRound = {
           id: round.id,
           hand: round.playersHand[currentPlayer.id].hand,
@@ -148,6 +163,21 @@ const Game = () => {
             setCurrentPlayerId(value);
           }
         });
+
+        currentRoom.state.currentTrick.cardsPlayed.onAdd = (
+          cardPlayed,
+          key
+        ) => {
+          console.log('cardsPlayed onAdd', cardPlayed);
+          console.log('currentTrick cardsPlayed key', key);
+          console.log('old', playersPlayedCard);
+          dispatch(
+            addPlayedCardAction({
+              playedId: parseInt(key),
+              cardPlayedId: cardPlayed.id,
+            })
+          );
+        };
       };
 
       // currentRoom.state.onChange = (changes) => {
@@ -190,6 +220,8 @@ const Game = () => {
   // console.log('players', players);
   // console.log('playerHand', playerHand);
   const currentPlayer = players.find((player) => player.id === currentPlayerId);
+  const isCurrentPlayer =
+    currentPlayer && userName && currentPlayer.name === userName;
 
   return (
     <div>
@@ -240,6 +272,13 @@ const Game = () => {
           // console.log('isCurrentPlayer', isCurrentPlayer);
           // console.log('currentPlayerId', currentPlayerId);
           // console.log('player.id', player.id);
+          const playerCard = playersPlayedCard.find(
+            (card) => card.playedId === player.id
+          );
+          // console.log('Inside Players playerCard', playerCard);
+          // console.log('player.id', player.id);
+          // console.log('playersPlayedCard', playersPlayedCard);
+
           return (
             <PlayerBoard key={idx}>
               <PlayerHeader>
@@ -252,42 +291,16 @@ const Game = () => {
                 </PlayerData>
               </PlayerHeader>
               <PlayerCardContainer>
-                {/* <Card {...cardList[1]} cursor={CURSOR_CLICKABLE} /> */}
+                {playerCard ? (
+                  <Card
+                    {...cardList[playerCard.cardPlayedId]}
+                    cursor={CURSOR_NORMAL}
+                  />
+                ) : null}
               </PlayerCardContainer>
             </PlayerBoard>
           );
         })}
-
-        {/* <PlayerBoard>
-          <PlayerHeader>Julien B79</PlayerHeader>
-          <PlayerCardContainer>
-            <Card {...cardList[2]} />
-          </PlayerCardContainer>
-        </PlayerBoard>
-        <PlayerBoard>
-          <PlayerHeader>OnePiece78</PlayerHeader>
-          <PlayerCardContainer>
-            <Card {...cardList[3]} />
-          </PlayerCardContainer>
-        </PlayerBoard>
-        <PlayerBoard>
-          <PlayerHeader>MonPote</PlayerHeader>
-          <PlayerCardContainer>
-            <Card {...cardList[8]} />
-          </PlayerCardContainer>
-        </PlayerBoard>
-        <PlayerBoard>
-          <PlayerHeader>Pandora_Of_Oz</PlayerHeader>
-          <PlayerCardContainer>
-            <Card {...cardList[10]} />
-          </PlayerCardContainer>
-        </PlayerBoard>
-        <PlayerBoard>
-          <PlayerHeader>Juliette</PlayerHeader>
-          <PlayerCardContainer>
-            <Card {...cardList[0]} />
-          </PlayerCardContainer>
-        </PlayerBoard> */}
       </Board>
       <PlayerHandContainer>
         {playerHand.map((card, idx) => {
@@ -296,8 +309,10 @@ const Game = () => {
             <CardContainer
               key={idx}
               onClick={() => {
-                console.log('click click');
-                currentRoom.send('PLAY_CARD', { value: cardData.id });
+                if (isCurrentPlayer) {
+                  console.log('click click');
+                  currentRoom.send('PLAY_CARD', { value: cardData.id });
+                }
               }}
             >
               <Card cursor={CURSOR_CLICKABLE} {...cardData} />
