@@ -95,6 +95,7 @@ const Game = () => {
   const [firstPlayer, setFirstPlayer] = useState(null);
   // Should be set after a message
   const [currentRound, setCurrentRound] = useState(0);
+  const [currentPlayerId, setCurrentPlayerId] = useState(-1);
 
   /**
    * FIXME Change to null after test
@@ -134,17 +135,34 @@ const Game = () => {
         // Do something
       };
 
-      currentRoom.state.onChange = (changes) => {
+      // console.log(
+      //   'currentRoom.state.currentTrick',
+      //   currentRoom.state.currentTrick
+      // );
+
+      currentRoom.state.currentTrick.onChange = (changes) => {
+        console.log('currentTrick', changes);
         changes.forEach((change) => {
           const { field, value } = change;
-          if (field === 'startingPlayer') {
-            setStartingPlayer(value);
-          }
-          if (field === 'firstPlayer') {
-            setFirstPlayer(value);
+          if (field === 'currentPlayer') {
+            setCurrentPlayerId(value);
           }
         });
       };
+
+      // currentRoom.state.onChange = (changes) => {
+      //   changes.forEach((change) => {
+      //     const { field, value } = change;
+      //     if (field === 'startingPlayer') {
+      //       setStartingPlayer(value);
+      //       setCurrentPlayerId(value);
+      //     }
+      //     if (field === 'firstPlayer') {
+      //       setFirstPlayer(value);
+      //       setCurrentPlayerId(value);
+      //     }
+      //   });
+      // };
 
       currentRoom.onMessage('START_BETTING', (message) => {
         setMaxBet(message.maxBet);
@@ -170,7 +188,8 @@ const Game = () => {
     playerBet <= maxBet;
 
   // console.log('players', players);
-  console.log('playerHand', playerHand);
+  // console.log('playerHand', playerHand);
+  const currentPlayer = players.find((player) => player.id === currentPlayerId);
 
   return (
     <div>
@@ -217,10 +236,16 @@ const Game = () => {
 
       <Board>
         {players.map((player, idx) => {
+          const isCurrentPlayer = currentPlayerId === player.id;
+          // console.log('isCurrentPlayer', isCurrentPlayer);
+          // console.log('currentPlayerId', currentPlayerId);
+          // console.log('player.id', player.id);
           return (
             <PlayerBoard key={idx}>
               <PlayerHeader>
-                <div>{player.name}</div>
+                <div style={{ color: isCurrentPlayer ? 'red' : 'blue' }}>
+                  {player.name}
+                </div>
                 <PlayerData>
                   <div>100pt</div>
                   <div>1/5</div>
@@ -275,7 +300,7 @@ const Game = () => {
                 currentRoom.send('PLAY_CARD', { value: cardData.id });
               }}
             >
-              <Card {...cardData} />
+              <Card cursor={CURSOR_CLICKABLE} {...cardData} />
             </CardContainer>
           );
         })}
