@@ -4,7 +4,11 @@ import styled from 'styled-components';
 
 import Card, { CURSOR_NORMAL, CURSOR_CLICKABLE, CURSOR_DISABLE } from './Card';
 import { cardList } from './utils';
-import { addRoundAction, addPlayedCardAction } from './ducks/game';
+import {
+  addRoundAction,
+  addPlayedCardAction,
+  clearPlayedCardAction,
+} from './ducks/game';
 
 const Board = styled.div`
   display: flex;
@@ -98,12 +102,14 @@ const Game = () => {
   const [currentPlayerId, setCurrentPlayerId] = useState(-1);
 
   const [currentTrick, setCurrentTrick] = useState(null);
+  const [isRoundStarted, setIsRoundStarted] = useState(false);
   // const [playersPlayedCard, setPlayersPlayedCard] = useState([]);
 
   const playersPlayedCard = useSelector(
     (state) => state.game.currentTrickPlayedCard
   );
-  console.log('external', playersPlayedCard);
+
+  console.log('playersPlayedCard', playersPlayedCard);
 
   /**
    * FIXME Change to null after test
@@ -117,6 +123,7 @@ const Game = () => {
   );
 
   useEffect(() => {
+    console.log('=== RESET === ');
     if (rounds.length > 0) {
       setPlayerHand(rounds[currentRound].hand);
     }
@@ -195,12 +202,16 @@ const Game = () => {
       // };
 
       currentRoom.onMessage('START_BETTING', (message) => {
+        console.log('START_BETTING', message);
         setMaxBet(message.maxBet);
         setGameMessage(message.topMessage);
+        setCurrentRound(message.maxBet - 1);
+        dispatch(clearPlayedCardAction());
       });
 
       currentRoom.onMessage('START_ROUND', (message) => {
         console.log('START_ROUND', message);
+        setIsRoundStarted(true);
       });
 
       currentRoom.onMessage('TOP_MESSAGE', (message) => {
@@ -226,7 +237,7 @@ const Game = () => {
   return (
     <div>
       <GameStateInfoContainer>
-        <GameStateInfo>Round 1</GameStateInfo>
+        <GameStateInfo>Round {currentRound + 1}</GameStateInfo>
       </GameStateInfoContainer>
       {gameMessage !== null ? (
         <GameStatusMessageContainer>
@@ -244,7 +255,7 @@ const Game = () => {
               type="number"
               className="form-control"
               min="0"
-              max="5"
+              max={maxBet}
               onChange={(e) => {
                 setPlayerBet(parseInt(e.target.value));
               }}
@@ -309,7 +320,7 @@ const Game = () => {
             <CardContainer
               key={idx}
               onClick={() => {
-                if (isCurrentPlayer) {
+                if (isRoundStarted && isCurrentPlayer) {
                   console.log('click click');
                   currentRoom.send('PLAY_CARD', { value: cardData.id });
                 }

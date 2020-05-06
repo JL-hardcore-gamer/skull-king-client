@@ -5,6 +5,7 @@ const SET_CURRENT_ROOM = 'SET_CURRENT_ROOM';
 const SET_PLAYERS = 'SET_PLAYERS';
 const ADD_ROUND = 'ADD_ROUND';
 const ADD_PLAYED_CARD = 'ADD_PLAYED_CARD';
+const CLEAR_PLAYED_CARD = 'CLEAR_PLAYED_CARD';
 
 export const setClientAction = (client) => {
   return { type: SET_CLIENT, payload: client };
@@ -32,6 +33,10 @@ export const addRoundAction = (newRound) => {
 
 export const addPlayedCardAction = (newPlayedCard) => {
   return { type: ADD_PLAYED_CARD, payload: newPlayedCard };
+};
+
+export const clearPlayedCardAction = () => {
+  return { type: CLEAR_PLAYED_CARD };
 };
 
 const defaultState = {
@@ -83,6 +88,11 @@ export default function reducer(state = defaultState, action = {}) {
           ...state.currentTrickPlayedCard,
           action.payload,
         ],
+      };
+    case CLEAR_PLAYED_CARD:
+      return {
+        ...state,
+        currentTrickPlayedCard: [],
       };
     default:
       return state;
