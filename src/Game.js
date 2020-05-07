@@ -124,7 +124,7 @@ const Game = () => {
   const scores = useSelector((state) => state.game.scores);
 
   const [maxBet, setMaxBet] = useState(-1);
-  const [playerBet, setPlayerBet] = useState(1);
+  const [playerBet, setPlayerBet] = useState(-1);
 
   const [gameMessage, setGameMessage] = useState(
     'Pandora_Of_Oz joue une carte'
@@ -255,11 +255,13 @@ const Game = () => {
     }
   }, [currentRoom, dispatch, playerHand, players, playersPlayedCard, userName]);
 
+  const regex = /^(?:[1-9]|0[1-9]|10)$/;
   const isCorrectBet =
     playerBet !== null &&
     maxBet != null &&
     playerBet >= 0 &&
-    playerBet <= maxBet;
+    playerBet <= maxBet &&
+    regex.test(playerBet);
 
   const currentPlayer = players.find((player) => player.id === currentPlayerId);
   const isCurrentPlayer =
@@ -297,8 +299,10 @@ const Game = () => {
                 className="btn btn-primary"
                 disabled={!isCorrectBet}
                 onClick={() => {
-                  currentRoom.send('BET', { value: playerBet });
-                  setMaxBet(-1);
+                  if (playerBet >= 0) {
+                    currentRoom.send('BET', { value: playerBet });
+                    setMaxBet(-1);
+                  }
                 }}
               >
                 Prêt à Yo-Ho-Ho
