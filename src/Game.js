@@ -229,6 +229,7 @@ const Game = () => {
 
       currentRoom.onMessage('NEXT_TRICK', (message) => {
         console.log('NEXT_TRICK', message);
+        dispatch(clearPlayedCardAction());
       });
 
       currentRoom.onMessage('TOP_MESSAGE', (message) => {
