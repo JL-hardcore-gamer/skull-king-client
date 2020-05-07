@@ -13,6 +13,7 @@ import {
   removeCardFromPlayerHandAction,
   setPlayersBetAction,
   playerWonTrickAction,
+  setScoresAction,
 } from './ducks/game';
 
 const Board = styled.div`
@@ -120,9 +121,7 @@ const Game = () => {
   );
 
   const playersBet = useSelector((state) => state.game.playersBet);
-  /**
-   * FIXME Change to null after test
-   */
+  const scores = useSelector((state) => state.game.scores);
 
   const [maxBet, setMaxBet] = useState(-1);
   const [playerBet, setPlayerBet] = useState(1);
@@ -212,6 +211,10 @@ const Game = () => {
         dispatch(clearPlayedCardAction());
         setIsRoundStarted(false);
         setBloodyMary(null);
+
+        if (message.scores) {
+          dispatch(setScoresAction(message.scores));
+        }
       });
 
       currentRoom.onMessage('START_ROUND', (message) => {
@@ -323,6 +326,10 @@ const Game = () => {
             (bet) => bet.playerId === player.id
           );
 
+          const playerScore = scores.find(
+            (score) => parseInt(score.playerId) === player.id
+          );
+
           return (
             <PlayerBoard key={idx}>
               <PlayerHeader>
@@ -330,12 +337,12 @@ const Game = () => {
                   {player.name}
                 </div>
                 <PlayerData>
-                  <div>100pt</div>
+                  <div>{playerScore ? `${playerScore.score}Pts` : '0Pt'}</div>
                   <div>
                     {' '}
                     {playerBet
                       ? `Bet: ${playerBet.tricksWon}/${playerBet.bet}`
-                      : ''}
+                      : 'Bet: -/-'}
                   </div>
                 </PlayerData>
               </PlayerHeader>
