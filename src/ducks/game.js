@@ -6,6 +6,8 @@ const SET_PLAYERS = 'SET_PLAYERS';
 const ADD_ROUND = 'ADD_ROUND';
 const ADD_PLAYED_CARD = 'ADD_PLAYED_CARD';
 const CLEAR_PLAYED_CARD = 'CLEAR_PLAYED_CARD';
+const SET_PLAYER_HAND = 'SET_PLAYER_HAND';
+const REMOVE_CARD_FROM_PLAYER_HAND = 'REMOVE_CARD_FROM_PLAYER_HAND';
 
 export const setClientAction = (client) => {
   return { type: SET_CLIENT, payload: client };
@@ -39,12 +41,21 @@ export const clearPlayedCardAction = () => {
   return { type: CLEAR_PLAYED_CARD };
 };
 
+export const setPlayerHandAction = (playerHand) => {
+  return { type: SET_PLAYER_HAND, payload: playerHand };
+};
+
+export const removeCardFromPlayerHandAction = (cardIdx) => {
+  return { type: REMOVE_CARD_FROM_PLAYER_HAND, payload: cardIdx };
+};
+
 const defaultState = {
   client: null,
   rooms: [],
   state: {},
   currentRoom: null,
   players: [],
+  playerHand: [],
   rounds: [],
   currentTrickPlayedCard: [],
 };
@@ -93,6 +104,18 @@ export default function reducer(state = defaultState, action = {}) {
       return {
         ...state,
         currentTrickPlayedCard: [],
+      };
+    case SET_PLAYER_HAND:
+      return {
+        ...state,
+        playerHand: action.payload,
+      };
+    case REMOVE_CARD_FROM_PLAYER_HAND:
+      return {
+        ...state,
+        playerHand: state.playerHand.filter(
+          (card) => card.id !== action.payload
+        ),
       };
     default:
       return state;

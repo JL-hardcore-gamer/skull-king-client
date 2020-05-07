@@ -7,11 +7,19 @@ const suits = [
 
 const specialCards = [
   {
-    id: 53,
+    id: 52,
     type: 'purple',
     color: '#9c27b0',
     value: 'JL King',
     icon1: 'fa-chess-king',
+    icon2: null,
+  },
+  {
+    id: 53,
+    type: 'pink',
+    color: '#e27b9e',
+    value: 'Mermaid',
+    icon1: 'fa-fish',
     icon2: null,
   },
   {
@@ -24,10 +32,10 @@ const specialCards = [
   },
   {
     id: 55,
-    type: 'pink',
-    color: '#e27b9e',
-    value: 'Mermaid',
-    icon1: 'fa-fish',
+    type: 'grey',
+    color: '#9e9e9e',
+    value: 'Pirate',
+    icon1: 'fa-skull-crossbones',
     icon2: null,
   },
   {
@@ -64,10 +72,10 @@ const specialCards = [
   },
   {
     id: 60,
-    type: 'grey',
-    color: '#9e9e9e',
-    value: 'Pirate',
-    icon1: 'fa-skull-crossbones',
+    type: 'white',
+    color: 'white',
+    value: 'Escape',
+    icon1: 'fa-flag',
     icon2: null,
   },
   {
@@ -104,14 +112,6 @@ const specialCards = [
   },
   {
     id: 65,
-    type: 'white',
-    color: 'white',
-    value: 'Escape',
-    icon1: 'fa-flag',
-    icon2: null,
-  },
-  {
-    id: 66,
     type: 'green',
     color: '#4caf50',
     value: 'Bloody Mary',
@@ -122,7 +122,7 @@ const specialCards = [
 
 const generateCardList = () => {
   let cardList = [];
-  let id = 1;
+  let id = 0;
   suits.forEach(({ color, type }) => {
     for (let i = 1; i <= 13; ++i) {
       cardList.push({

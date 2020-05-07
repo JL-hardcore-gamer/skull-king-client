@@ -8,6 +8,8 @@ import {
   addRoundAction,
   addPlayedCardAction,
   clearPlayedCardAction,
+  setPlayerHandAction,
+  removeCardFromPlayerHandAction,
 } from './ducks/game';
 
 const Board = styled.div`
@@ -93,7 +95,7 @@ const Game = () => {
   const players = useSelector((state) => state.game.players);
   const rounds = useSelector((state) => state.game.rounds);
 
-  const [playerHand, setPlayerHand] = useState([]);
+  const playerHand = useSelector((state) => state.game.playerHand);
   const [allowedCards, setAllowedCards] = useState([]);
   const [startingPlayer, setStartingPlayer] = useState(null);
   const [firstPlayer, setFirstPlayer] = useState(null);
@@ -103,13 +105,10 @@ const Game = () => {
 
   const [currentTrick, setCurrentTrick] = useState(null);
   const [isRoundStarted, setIsRoundStarted] = useState(false);
-  // const [playersPlayedCard, setPlayersPlayedCard] = useState([]);
 
   const playersPlayedCard = useSelector(
     (state) => state.game.currentTrickPlayedCard
   );
-
-  console.log('playersPlayedCard', playersPlayedCard);
 
   /**
    * FIXME Change to null after test
@@ -125,7 +124,9 @@ const Game = () => {
   useEffect(() => {
     console.log('=== RESET === ');
     if (rounds.length > 0) {
-      setPlayerHand(rounds[currentRound].hand);
+      console.log('reset currentRound', currentRound);
+      dispatch(setPlayerHandAction(rounds[currentRound].hand));
+      // setPlayerHand();
     }
   }, [currentRound, rounds]);
 
@@ -139,10 +140,16 @@ const Game = () => {
         );
 
         round.playersHand[currentPlayer.id].hand.onRemove = (card, key) => {
+          /**
+           * FIXME This function is buggy
+           */
+          console.log('remove card: ', card);
+          console.log('key:', key);
           // Add checking ?
           // What happen when we have several rounds ?
-          let newPlayerHand = playerHand.filter((card, idx) => idx !== key);
-          setPlayerHand(newPlayerHand);
+          // let newPlayerHand = playerHand.filter((card, idx) => idx !== key);
+          // setPlayerHand(newPlayerHand);
+          dispatch(removeCardFromPlayerHandAction(card.id));
         };
 
         const newRound = {
@@ -175,7 +182,7 @@ const Game = () => {
           cardPlayed,
           key
         ) => {
-          console.log('cardsPlayed onAdd', cardPlayed);
+          console.log('cardsPlayed onAdd', cardPlayed.friendlyName);
           console.log('currentTrick cardsPlayed key', key);
           console.log('old', playersPlayedCard);
           dispatch(
@@ -185,21 +192,21 @@ const Game = () => {
             })
           );
         };
-      };
 
-      // currentRoom.state.onChange = (changes) => {
-      //   changes.forEach((change) => {
-      //     const { field, value } = change;
-      //     if (field === 'startingPlayer') {
-      //       setStartingPlayer(value);
-      //       setCurrentPlayerId(value);
-      //     }
-      //     if (field === 'firstPlayer') {
-      //       setFirstPlayer(value);
-      //       setCurrentPlayerId(value);
-      //     }
-      //   });
-      // };
+        currentRoom.state.currentTrick.cardsPlayed.onChange = (
+          cardPlayed,
+          key
+        ) => {
+          console.log('currentTrick.cardsPlayed.onChange', cardPlayed);
+          console.log('key', key);
+          dispatch(
+            addPlayedCardAction({
+              playedId: parseInt(key),
+              cardPlayedId: cardPlayed.id,
+            })
+          );
+        };
+      };
 
       currentRoom.onMessage('START_BETTING', (message) => {
         console.log('START_BETTING', message);
@@ -207,6 +214,7 @@ const Game = () => {
         setGameMessage(message.topMessage);
         setCurrentRound(message.maxBet - 1);
         dispatch(clearPlayedCardAction());
+        setIsRoundStarted(false);
       });
 
       currentRoom.onMessage('START_ROUND', (message) => {
@@ -220,7 +228,7 @@ const Game = () => {
     } else {
       // Error the logic has not been implemented
     }
-  }, [currentRoom, dispatch, players, userName]);
+  }, [currentRoom, dispatch, playerHand, players, playersPlayedCard, userName]);
 
   const isCorrectBet =
     playerBet !== null &&
@@ -280,15 +288,9 @@ const Game = () => {
       <Board>
         {players.map((player, idx) => {
           const isCurrentPlayer = currentPlayerId === player.id;
-          // console.log('isCurrentPlayer', isCurrentPlayer);
-          // console.log('currentPlayerId', currentPlayerId);
-          // console.log('player.id', player.id);
           const playerCard = playersPlayedCard.find(
             (card) => card.playedId === player.id
           );
-          // console.log('Inside Players playerCard', playerCard);
-          // console.log('player.id', player.id);
-          // console.log('playersPlayedCard', playersPlayedCard);
 
           return (
             <PlayerBoard key={idx}>
