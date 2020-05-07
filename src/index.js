@@ -24,13 +24,11 @@ const store = createStore(reducers, enhancer);
 const client = new Colyseus.Client('ws://localhost:2567');
 store.dispatch(setClientAction(client));
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </Provider>
-  </React.StrictMode>,
+  <Provider store={store}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </Provider>,
   document.getElementById('root')
 );
 

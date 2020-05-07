@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import Modal from 'react-bootstrap/Modal';
 
 import Card, { CURSOR_NORMAL, CURSOR_CLICKABLE, CURSOR_DISABLE } from './Card';
 import { cardList } from './utils';
@@ -88,6 +89,11 @@ const GameBet = styled.div`
   width: 500px;
 `;
 
+const BloodyMaryChoice = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 const Game = () => {
   const dispatch = useDispatch();
   const userName = useSelector((state) => state.user.data.nickname);
@@ -95,13 +101,16 @@ const Game = () => {
   const players = useSelector((state) => state.game.players);
   const rounds = useSelector((state) => state.game.rounds);
 
+  const [showBloodyMary, setShowBloodyMary] = useState(false);
+
+  const handleClose = () => setShowBloodyMary(false);
+  const handleShow = () => setShowBloodyMary(true);
+
   const playerHand = useSelector((state) => state.game.playerHand);
-  const [allowedCards, setAllowedCards] = useState([]);
-  const [startingPlayer, setStartingPlayer] = useState(null);
-  const [firstPlayer, setFirstPlayer] = useState(null);
   // Should be set after a message
   const [currentRound, setCurrentRound] = useState(0);
   const [currentPlayerId, setCurrentPlayerId] = useState(-1);
+  const [bloodyMary, setBloodyMary] = useState(null);
 
   const [currentTrick, setCurrentTrick] = useState(null);
   const [isRoundStarted, setIsRoundStarted] = useState(false);
@@ -170,11 +179,15 @@ const Game = () => {
       // );
 
       currentRoom.state.currentTrick.onChange = (changes) => {
-        console.log('currentTrick', changes);
+        console.log('currentTrick onChange', changes);
         changes.forEach((change) => {
           const { field, value } = change;
           if (field === 'currentPlayer') {
             setCurrentPlayerId(value);
+          }
+          if (field === 'bloodyMary') {
+            console.log('===> Change bloodyMary', field);
+            setBloodyMary(value);
           }
         });
 
@@ -215,6 +228,7 @@ const Game = () => {
         setCurrentRound(message.maxBet - 1);
         dispatch(clearPlayedCardAction());
         setIsRoundStarted(false);
+        setBloodyMary(null);
       });
 
       currentRoom.onMessage('START_ROUND', (message) => {
@@ -230,6 +244,7 @@ const Game = () => {
       currentRoom.onMessage('NEXT_TRICK', (message) => {
         console.log('NEXT_TRICK', message);
         dispatch(clearPlayedCardAction());
+        setBloodyMary(null);
       });
 
       currentRoom.onMessage('TOP_MESSAGE', (message) => {
@@ -256,6 +271,7 @@ const Game = () => {
     <div>
       <GameStateInfoContainer>
         <GameStateInfo>Round {currentRound + 1}</GameStateInfo>
+        <button onClick={() => handleShow()}>Test</button>
       </GameStateInfoContainer>
       {gameMessage !== null ? (
         <GameStatusMessageContainer>
@@ -302,6 +318,13 @@ const Game = () => {
             (card) => card.playedId === player.id
           );
 
+          let cardId = playerCard && playerCard.cardPlayedId;
+          if (cardId === 65 && bloodyMary === 'pirate') {
+            cardId = 66;
+          } else if (cardId === 65 && bloodyMary === 'escape') {
+            cardId = 67;
+          }
+
           return (
             <PlayerBoard key={idx}>
               <PlayerHeader>
@@ -315,10 +338,7 @@ const Game = () => {
               </PlayerHeader>
               <PlayerCardContainer>
                 {playerCard ? (
-                  <Card
-                    {...cardList[playerCard.cardPlayedId]}
-                    cursor={CURSOR_NORMAL}
-                  />
+                  <Card {...cardList[cardId]} cursor={CURSOR_NORMAL} />
                 ) : null}
               </PlayerCardContainer>
             </PlayerBoard>
@@ -334,7 +354,11 @@ const Game = () => {
               onClick={() => {
                 if (isRoundStarted && isCurrentPlayer) {
                   console.log('click click');
-                  currentRoom.send('PLAY_CARD', { value: cardData.id });
+                  if (card.id === 65) {
+                    handleShow();
+                  } else {
+                    currentRoom.send('PLAY_CARD', { value: cardData.id });
+                  }
                 }
               }}
             >
@@ -343,6 +367,47 @@ const Game = () => {
           );
         })}
       </PlayerHandContainer>
+      <Modal show={showBloodyMary} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Bloody Mary</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div style={{ textAlign: 'center' }}>
+            Woohoo, tu es plutôt{' '}
+            <i className={`fas fa-skull-crossbones fa-lg`} /> ou{' '}
+            <i className={`fas fa-flag fa-lg`} /> ?
+          </div>
+
+          <BloodyMaryChoice>
+            <CardContainer
+              onClick={() => {
+                if (currentRoom) {
+                  currentRoom.send('PLAY_CARD', {
+                    value: 65,
+                    bloodyMaryChoice: 'pirate',
+                  });
+                }
+                handleClose();
+              }}
+            >
+              <Card cursor={CURSOR_CLICKABLE} {...cardList[66]} />
+            </CardContainer>
+            <CardContainer
+              onClick={() => {
+                if (currentRoom) {
+                  currentRoom.send('PLAY_CARD', {
+                    value: 65,
+                    bloodyMaryChoice: 'escape',
+                  });
+                }
+                handleClose();
+              }}
+            >
+              <Card cursor={CURSOR_CLICKABLE} {...cardList[67]} />
+            </CardContainer>
+          </BloodyMaryChoice>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

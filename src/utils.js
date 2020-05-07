@@ -118,6 +118,22 @@ const specialCards = [
     icon1: 'fa-skull-crossbones',
     icon2: 'fa-flag',
   },
+  {
+    id: 66,
+    type: 'green-choice',
+    color: '#9e9e9e',
+    value: 'Bloody Mary',
+    icon1: 'fa-skull-crossbones',
+    icon2: null,
+  },
+  {
+    id: 67,
+    type: 'green-choice',
+    color: 'white',
+    value: 'Bloody Mary',
+    icon1: 'fa-flag',
+    icon2: null,
+  },
 ];
 
 const generateCardList = () => {

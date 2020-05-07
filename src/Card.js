@@ -52,6 +52,7 @@ const Card = ({ type, color, value, icon1, icon2, cursor }) => {
     case 'pink':
     case 'grey':
     case 'white':
+    case 'green-choice':
       cardContent = (
         <>
           <CardTitle>{value}</CardTitle>
