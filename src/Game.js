@@ -111,13 +111,13 @@ const Game = () => {
   const [currentRound, setCurrentRound] = useState(0);
   const [currentPlayerId, setCurrentPlayerId] = useState(-1);
   const [bloodyMary, setBloodyMary] = useState(null);
-
-  const [currentTrick, setCurrentTrick] = useState(null);
   const [isRoundStarted, setIsRoundStarted] = useState(false);
 
   const playersPlayedCard = useSelector(
     (state) => state.game.currentTrickPlayedCard
   );
+
+  const [playersBet, setPlayersBet] = useState([]);
 
   /**
    * FIXME Change to null after test
@@ -133,9 +133,7 @@ const Game = () => {
   useEffect(() => {
     console.log('=== RESET === ');
     if (rounds.length > 0) {
-      console.log('reset currentRound', currentRound);
       dispatch(setPlayerHandAction(rounds[currentRound].hand));
-      // setPlayerHand();
     }
   }, [currentRound, rounds]);
 
@@ -148,19 +146,6 @@ const Game = () => {
           (player) => player.name === userName
         );
 
-        round.playersHand[currentPlayer.id].hand.onRemove = (card, key) => {
-          /**
-           * FIXME This function is buggy
-           */
-          // console.log('remove card: ', card);
-          // console.log('key:', key);
-          // Add checking ?
-          // What happen when we have several rounds ?
-          // let newPlayerHand = playerHand.filter((card, idx) => idx !== key);
-          // setPlayerHand(newPlayerHand);
-          // dispatch(removeCardFromPlayerHandAction(card.id));
-        };
-
         const newRound = {
           id: round.id,
           hand: round.playersHand[currentPlayer.id].hand,
@@ -169,24 +154,13 @@ const Game = () => {
         dispatch(addRoundAction(newRound));
       };
 
-      currentRoom.state.game.remainingRounds.onRemove = (round, i) => {
-        // Do something
-      };
-
-      // console.log(
-      //   'currentRoom.state.currentTrick',
-      //   currentRoom.state.currentTrick
-      // );
-
       currentRoom.state.currentTrick.onChange = (changes) => {
-        console.log('currentTrick onChange', changes);
         changes.forEach((change) => {
           const { field, value } = change;
           if (field === 'currentPlayer') {
             setCurrentPlayerId(value);
           }
           if (field === 'bloodyMary') {
-            console.log('===> Change bloodyMary', field);
             setBloodyMary(value);
           }
         });
@@ -195,9 +169,6 @@ const Game = () => {
           cardPlayed,
           key
         ) => {
-          console.log('cardsPlayed onAdd', cardPlayed.friendlyName);
-          console.log('currentTrick cardsPlayed key', key);
-          console.log('old', playersPlayedCard);
           dispatch(
             addPlayedCardAction({
               playedId: parseInt(key),
@@ -210,8 +181,6 @@ const Game = () => {
           cardPlayed,
           key
         ) => {
-          console.log('currentTrick.cardsPlayed.onChange', cardPlayed);
-          console.log('key', key);
           dispatch(
             addPlayedCardAction({
               playedId: parseInt(key),
@@ -219,10 +188,23 @@ const Game = () => {
             })
           );
         };
+
+        currentRoom.state.game.scoreboard.onAdd = (score, key) => {
+          console.log('onAdd score', score);
+          console.log('onAdd key', key);
+        };
+
+        currentRoom.state.game.scoreboard.onChange = (score, key) => {
+          console.log('onChange score', score);
+          console.log('onChange key', key);
+        };
       };
 
+      currentRoom.onMessage('TOP_MESSAGE', (message) => {
+        setGameMessage(message);
+      });
+
       currentRoom.onMessage('START_BETTING', (message) => {
-        console.log('START_BETTING', message);
         setMaxBet(message.maxBet);
         setGameMessage(message.topMessage);
         setCurrentRound(message.maxBet - 1);
@@ -234,21 +216,25 @@ const Game = () => {
       currentRoom.onMessage('START_ROUND', (message) => {
         console.log('START_ROUND', message);
         setIsRoundStarted(true);
+        setPlayersBet(
+          message.playersBet.map((bet) => ({
+            playerId: parseInt(bet.playerId),
+            bet: bet.bet,
+          }))
+        );
       });
 
       currentRoom.onMessage('CARD_VALIDATED', (message) => {
-        console.log('cardId removed', message.value);
         dispatch(removeCardFromPlayerHandAction(message.value));
       });
 
       currentRoom.onMessage('NEXT_TRICK', (message) => {
-        console.log('NEXT_TRICK', message);
         dispatch(clearPlayedCardAction());
         setBloodyMary(null);
       });
-
-      currentRoom.onMessage('TOP_MESSAGE', (message) => {
-        setGameMessage(message);
+      currentRoom.onMessage('GAME_OVER', (message) => {
+        console.log('GAME_OVER', message);
+        // FIXME Do Something
       });
     } else {
       // Error the logic has not been implemented
@@ -261,17 +247,21 @@ const Game = () => {
     playerBet >= 0 &&
     playerBet <= maxBet;
 
-  // console.log('players', players);
-  // console.log('playerHand', playerHand);
   const currentPlayer = players.find((player) => player.id === currentPlayerId);
   const isCurrentPlayer =
     currentPlayer && userName && currentPlayer.name === userName;
+
+  if (currentRoom && isRoundStarted) {
+    console.log(
+      'tricksBet of MonPote',
+      currentRoom.state.game.remainingRounds[0].playersScore[1].tricksBet
+    );
+  }
 
   return (
     <div>
       <GameStateInfoContainer>
         <GameStateInfo>Round {currentRound + 1}</GameStateInfo>
-        <button onClick={() => handleShow()}>Test</button>
       </GameStateInfoContainer>
       {gameMessage !== null ? (
         <GameStatusMessageContainer>
@@ -325,6 +315,10 @@ const Game = () => {
             cardId = 67;
           }
 
+          const playerBet = playersBet.find(
+            (bet) => bet.playerId === player.id
+          );
+
           return (
             <PlayerBoard key={idx}>
               <PlayerHeader>
@@ -333,7 +327,7 @@ const Game = () => {
                 </div>
                 <PlayerData>
                   <div>100pt</div>
-                  <div>1/5</div>
+                  <div> {playerBet ? `Bet: 0/${playerBet.bet}` : ''}</div>
                 </PlayerData>
               </PlayerHeader>
               <PlayerCardContainer>
@@ -353,7 +347,6 @@ const Game = () => {
               key={idx}
               onClick={() => {
                 if (isRoundStarted && isCurrentPlayer) {
-                  console.log('click click');
                   if (card.id === 65) {
                     handleShow();
                   } else {
