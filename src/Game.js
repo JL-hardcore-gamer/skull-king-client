@@ -97,6 +97,15 @@ const BloodyMaryChoice = styled.div`
   justify-content: center;
 `;
 
+const WinnerScreen = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 50px;
+  font-size: 25px;
+`;
+
 const Game = () => {
   const dispatch = useDispatch();
   const userName = useSelector((state) => state.user.data.nickname);
@@ -125,6 +134,7 @@ const Game = () => {
 
   const [maxBet, setMaxBet] = useState(-1);
   const [playerBet, setPlayerBet] = useState(-1);
+  const [winner, setWinner] = useState(1);
 
   const [gameMessage, setGameMessage] = useState(
     'Pandora_Of_Oz joue une carte'
@@ -267,7 +277,8 @@ const Game = () => {
   const isCurrentPlayer =
     currentPlayer && userName && currentPlayer.name === userName;
 
-  return (
+  // const isCurrentPlayerWinner = currentPlayer.id === winner;
+  return winner === null ? (
     <div>
       <GameStateInfoContainer>
         <GameStateInfo>Round {currentRound + 1}</GameStateInfo>
@@ -422,6 +433,26 @@ const Game = () => {
         </Modal.Body>
       </Modal>
     </div>
+  ) : (
+    <WinnerScreen>
+      <div>
+        Oh tu as perdu ? C'est pas grave... l'important c'est de participer !{' '}
+        <span role="img">🤣</span>
+        <div>
+          Voici un cookie <span role="img">🍪😘</span> (Tu peux cliquer{' '}
+          <button className="btn btn-primary">ici</button> pour revenir au
+          lobby)
+        </div>
+      </div>
+      <div>
+        <div>On m'a dit que tu étais le nouveau King ? GG 🥳🥳🥳</div>
+        <div>Hop pop pop, on ne prend pas la grosse tête ! 🤨</div>
+        <div>
+          (Tu peux cliquer <button className="btn btn-primary">ici</button> pour
+          revenir au lobby)
+        </div>
+      </div>
+    </WinnerScreen>
   );
 };
 

@@ -3,6 +3,7 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 
+import { API } from './config';
 import NavBar from './NavBar';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
@@ -69,7 +70,7 @@ const App = () => {
     // Check if user correct
     if (nickname && token) {
       axios
-        .post('http://localhost:2567/api/check-user', {
+        .post(`${API}/api/check-user`, {
           nickname,
           token,
         })

@@ -9,6 +9,7 @@ import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+import { WS } from './config';
 import App from './App';
 import reducers from './ducks/reducers';
 import { setClientAction } from './ducks/game';
@@ -21,7 +22,8 @@ const composeEnhancers =
 const enhancer = composeEnhancers();
 const store = createStore(reducers, enhancer);
 
-const client = new Colyseus.Client('ws://localhost:2567');
+const client = new Colyseus.Client(WS);
+
 store.dispatch(setClientAction(client));
 ReactDOM.render(
   <Provider store={store}>

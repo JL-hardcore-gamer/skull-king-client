@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+
+import { API } from './config';
 import { setUserAction, setUserServerCheckedAction } from './ducks/user';
 
 const LoginContainer = styled.div`
@@ -28,7 +30,7 @@ const Signup = (props) => {
 
   const onSubmit = () => {
     axios
-      .post('http://localhost:2567/api/signup', {
+      .post(`${API}/api/signup`, {
         email,
         nickname,
       })
@@ -46,6 +48,8 @@ const Signup = (props) => {
         history.push('/');
       });
   };
+
+  console.log('process.env', process.env);
 
   return (
     <LoginContainer>
