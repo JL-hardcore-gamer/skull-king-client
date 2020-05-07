@@ -8,6 +8,8 @@ const ADD_PLAYED_CARD = 'ADD_PLAYED_CARD';
 const CLEAR_PLAYED_CARD = 'CLEAR_PLAYED_CARD';
 const SET_PLAYER_HAND = 'SET_PLAYER_HAND';
 const REMOVE_CARD_FROM_PLAYER_HAND = 'REMOVE_CARD_FROM_PLAYER_HAND';
+const SET_PLAYERS_BET = 'SET_PLAYERS_BET';
+const PLAYER_WON_TRICK = 'PLAYER_WON_TRICK';
 
 export const setClientAction = (client) => {
   return { type: SET_CLIENT, payload: client };
@@ -49,6 +51,14 @@ export const removeCardFromPlayerHandAction = (cardIdx) => {
   return { type: REMOVE_CARD_FROM_PLAYER_HAND, payload: cardIdx };
 };
 
+export const setPlayersBetAction = (playersBet) => {
+  return { type: SET_PLAYERS_BET, payload: playersBet };
+};
+
+export const playerWonTrickAction = (winnerId) => {
+  return { type: PLAYER_WON_TRICK, payload: winnerId };
+};
+
 const defaultState = {
   client: null,
   rooms: [],
@@ -58,6 +68,7 @@ const defaultState = {
   playerHand: [],
   rounds: [],
   currentTrickPlayedCard: [],
+  playersBet: [],
 };
 
 export default function reducer(state = defaultState, action = {}) {
@@ -116,6 +127,21 @@ export default function reducer(state = defaultState, action = {}) {
         playerHand: state.playerHand.filter(
           (card) => card.id !== action.payload
         ),
+      };
+    case SET_PLAYERS_BET:
+      return {
+        ...state,
+        playersBet: action.payload,
+      };
+
+    case PLAYER_WON_TRICK:
+      const winnerId = action.payload;
+      let newPlayersBet = [...state.playersBet];
+      let winnerIdx = newPlayersBet.findIndex((p) => p.playerId === winnerId);
+      newPlayersBet[winnerIdx].tricksWon += 1;
+      return {
+        ...state,
+        playersBet: newPlayersBet,
       };
     default:
       return state;

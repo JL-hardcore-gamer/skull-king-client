@@ -11,6 +11,8 @@ import {
   clearPlayedCardAction,
   setPlayerHandAction,
   removeCardFromPlayerHandAction,
+  setPlayersBetAction,
+  playerWonTrickAction,
 } from './ducks/game';
 
 const Board = styled.div`
@@ -117,8 +119,7 @@ const Game = () => {
     (state) => state.game.currentTrickPlayedCard
   );
 
-  const [playersBet, setPlayersBet] = useState([]);
-
+  const playersBet = useSelector((state) => state.game.playersBet);
   /**
    * FIXME Change to null after test
    */
@@ -216,11 +217,14 @@ const Game = () => {
       currentRoom.onMessage('START_ROUND', (message) => {
         console.log('START_ROUND', message);
         setIsRoundStarted(true);
-        setPlayersBet(
-          message.playersBet.map((bet) => ({
-            playerId: parseInt(bet.playerId),
-            bet: bet.bet,
-          }))
+        dispatch(
+          setPlayersBetAction(
+            message.playersBet.map((bet) => ({
+              playerId: parseInt(bet.playerId),
+              bet: bet.bet,
+              tricksWon: 0,
+            }))
+          )
         );
       });
 
@@ -232,6 +236,13 @@ const Game = () => {
         dispatch(clearPlayedCardAction());
         setBloodyMary(null);
       });
+
+      currentRoom.onMessage('TRICK_WINNER', (message) => {
+        console.log('TRICK_WINNER', message);
+        const winnerId = message.value;
+        dispatch(playerWonTrickAction(winnerId));
+      });
+
       currentRoom.onMessage('GAME_OVER', (message) => {
         console.log('GAME_OVER', message);
         // FIXME Do Something
@@ -250,13 +261,6 @@ const Game = () => {
   const currentPlayer = players.find((player) => player.id === currentPlayerId);
   const isCurrentPlayer =
     currentPlayer && userName && currentPlayer.name === userName;
-
-  if (currentRoom && isRoundStarted) {
-    console.log(
-      'tricksBet of MonPote',
-      currentRoom.state.game.remainingRounds[0].playersScore[1].tricksBet
-    );
-  }
 
   return (
     <div>
@@ -327,7 +331,12 @@ const Game = () => {
                 </div>
                 <PlayerData>
                   <div>100pt</div>
-                  <div> {playerBet ? `Bet: 0/${playerBet.bet}` : ''}</div>
+                  <div>
+                    {' '}
+                    {playerBet
+                      ? `Bet: ${playerBet.tricksWon}/${playerBet.bet}`
+                      : ''}
+                  </div>
                 </PlayerData>
               </PlayerHeader>
               <PlayerCardContainer>
