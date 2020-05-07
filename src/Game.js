@@ -143,13 +143,13 @@ const Game = () => {
           /**
            * FIXME This function is buggy
            */
-          console.log('remove card: ', card);
-          console.log('key:', key);
+          // console.log('remove card: ', card);
+          // console.log('key:', key);
           // Add checking ?
           // What happen when we have several rounds ?
           // let newPlayerHand = playerHand.filter((card, idx) => idx !== key);
           // setPlayerHand(newPlayerHand);
-          dispatch(removeCardFromPlayerHandAction(card.id));
+          // dispatch(removeCardFromPlayerHandAction(card.id));
         };
 
         const newRound = {
@@ -220,6 +220,15 @@ const Game = () => {
       currentRoom.onMessage('START_ROUND', (message) => {
         console.log('START_ROUND', message);
         setIsRoundStarted(true);
+      });
+
+      currentRoom.onMessage('CARD_VALIDATED', (message) => {
+        console.log('cardId removed', message.value);
+        dispatch(removeCardFromPlayerHandAction(message.value));
+      });
+
+      currentRoom.onMessage('NEXT_TRICK', (message) => {
+        console.log('NEXT_TRICK', message);
       });
 
       currentRoom.onMessage('TOP_MESSAGE', (message) => {
