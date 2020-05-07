@@ -255,7 +255,7 @@ const Game = () => {
     }
   }, [currentRoom, dispatch, playerHand, players, playersPlayedCard, userName]);
 
-  const regex = /^(?:[1-9]|0[1-9]|10)$/;
+  const regex = /^(?:[1-9]|0[1-9]|10|0)$/;
   const isCorrectBet =
     playerBet !== null &&
     maxBet != null &&
