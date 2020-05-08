@@ -16,16 +16,21 @@ const NavBar = (props) => {
       <ul className="nav justify-content-end">
         {user && user.nickname ? (
           <>
-            <li className="nav-item">
-              <Link className="nav-link" to="/game">
-                Game (dev)
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/assets">
-                Assets (dev)
-              </Link>
-            </li>
+            {process.env.NODE_ENV === 'development' ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/game">
+                    Game (dev)
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/assets">
+                    Assets (dev)
+                  </Link>
+                </li>
+              </>
+            ) : null}
+
             <li className="nav-item">
               <Link
                 className="nav-link"

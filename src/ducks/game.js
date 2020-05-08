@@ -11,6 +11,7 @@ const REMOVE_CARD_FROM_PLAYER_HAND = 'REMOVE_CARD_FROM_PLAYER_HAND';
 const SET_PLAYERS_BET = 'SET_PLAYERS_BET';
 const PLAYER_WON_TRICK = 'PLAYER_WON_TRICK';
 const SET_SCORES = 'SET_SCORES';
+const RESET_GAME = 'RESET_GAME';
 
 export const setClientAction = (client) => {
   return { type: SET_CLIENT, payload: client };
@@ -62,6 +63,10 @@ export const playerWonTrickAction = (winnerId) => {
 
 export const setScoresAction = (newScores) => {
   return { type: SET_SCORES, payload: newScores };
+};
+
+export const resetGameAction = () => {
+  return { type: RESET_GAME };
 };
 
 const defaultState = {
@@ -153,6 +158,17 @@ export default function reducer(state = defaultState, action = {}) {
       return {
         ...state,
         scores: action.payload,
+      };
+    case RESET_GAME:
+      return {
+        ...state,
+        currentRoom: null,
+        players: [],
+        playerHand: [],
+        rounds: [],
+        currentTrickPlayedCard: [],
+        playersBet: [],
+        scores: [],
       };
     default:
       return state;

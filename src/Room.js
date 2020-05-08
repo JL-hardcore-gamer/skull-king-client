@@ -57,15 +57,19 @@ const Room = (props) => {
         console.error(e);
       });
 
-    // FIXME
-    currentRoom.onMessage('GAME_STATE', (message) => {
-      console.log('message received from server');
-      console.log(message);
-    });
+    if (currentRoom) {
+      // FIXME
+      currentRoom.onMessage('GAME_STATE', (message) => {
+        console.log('message received from server');
+        console.log(message);
+      });
 
-    currentRoom.onMessage('GAME_STARTED', (message) => {
-      history.push('/game');
-    });
+      currentRoom.onMessage('GAME_STARTED', (message) => {
+        history.push('/game');
+      });
+    } else {
+      history.push('/');
+    }
   }, [client, currentRoom, dispatch, history]);
 
   return (

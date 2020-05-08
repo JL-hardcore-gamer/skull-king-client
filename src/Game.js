@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Modal from 'react-bootstrap/Modal';
 
@@ -14,6 +15,7 @@ import {
   setPlayersBetAction,
   playerWonTrickAction,
   setScoresAction,
+  resetGameAction,
 } from './ducks/game';
 
 const Board = styled.div`
@@ -108,6 +110,7 @@ const WinnerScreen = styled.div`
 
 const Game = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const userName = useSelector((state) => state.user.data.nickname);
   const currentRoom = useSelector((state) => state.game.currentRoom);
   const players = useSelector((state) => state.game.players);
@@ -134,11 +137,21 @@ const Game = () => {
 
   const [maxBet, setMaxBet] = useState(-1);
   const [playerBet, setPlayerBet] = useState(-1);
-  const [winner, setWinner] = useState(1);
+  const [winners, setWinners] = useState([]);
 
-  const [gameMessage, setGameMessage] = useState(
-    'Pandora_Of_Oz joue une carte'
-  );
+  const [gameMessage, setGameMessage] = useState('');
+
+  useEffect(() => {
+    if (!currentRoom) {
+      history.push('/');
+    }
+    return () => {
+      console.log('Cleanup');
+      dispatch(resetGameAction());
+    };
+  }, []);
+
+  console.log('currentRoom', currentRoom);
 
   useEffect(() => {
     console.log('=== RESET === ');
@@ -258,6 +271,8 @@ const Game = () => {
 
       currentRoom.onMessage('GAME_OVER', (message) => {
         console.log('GAME_OVER', message);
+        console.log('winners', message.winners);
+        setWinners(message.winners);
         // FIXME Do Something
       });
     } else {
@@ -277,8 +292,15 @@ const Game = () => {
   const isCurrentPlayer =
     currentPlayer && userName && currentPlayer.name === userName;
 
+  let isCurrentPlayerWinner = null;
+  if (winners.length > 0) {
+    isCurrentPlayerWinner = winners.includes(currentPlayer.id.toString());
+    console.log('winners', winners);
+    console.log('currentPlayer', currentPlayer);
+  }
+
   // const isCurrentPlayerWinner = currentPlayer.id === winner;
-  return winner !== null ? (
+  return winners.length === 0 ? (
     <div>
       <GameStateInfoContainer>
         <GameStateInfo>Round {currentRound + 1}</GameStateInfo>
@@ -435,23 +457,31 @@ const Game = () => {
     </div>
   ) : (
     <WinnerScreen>
-      <div>
-        Oh tu as perdu ? C'est pas grave... l'important c'est de participer !{' '}
-        <span role="img">🤣</span>
+      {isCurrentPlayerWinner ? (
         <div>
-          Voici un cookie <span role="img">🍪😘</span> (Tu peux cliquer{' '}
-          <button className="btn btn-primary">ici</button> pour revenir au
-          lobby)
+          <div>On m'a dit que tu étais le nouveau King ? GG 🥳🥳🥳</div>
+          <div>Hop pop pop, on ne prend pas la grosse tête ! 🤨</div>
+          <div>
+            (Tu peux cliquer{' '}
+            <Link className="btn btn-primary" to="/">
+              ici
+            </Link>{' '}
+            pour revenir au lobby)
+          </div>
         </div>
-      </div>
-      <div>
-        <div>On m'a dit que tu étais le nouveau King ? GG 🥳🥳🥳</div>
-        <div>Hop pop pop, on ne prend pas la grosse tête ! 🤨</div>
+      ) : (
         <div>
-          (Tu peux cliquer <button className="btn btn-primary">ici</button> pour
-          revenir au lobby)
+          Oh tu as perdu ? C'est pas grave... l'important c'est de participer !{' '}
+          <span role="img">🤣</span>
+          <div>
+            Voici un cookie <span role="img">🍪😘</span> (Tu peux cliquer{' '}
+            <Link className="btn btn-primary" to="/">
+              ici
+            </Link>{' '}
+            pour revenir au lobby)
+          </div>
         </div>
-      </div>
+      )}
     </WinnerScreen>
   );
 };
