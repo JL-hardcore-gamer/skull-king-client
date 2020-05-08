@@ -278,7 +278,7 @@ const Game = () => {
     currentPlayer && userName && currentPlayer.name === userName;
 
   // const isCurrentPlayerWinner = currentPlayer.id === winner;
-  return winner === null ? (
+  return winner !== null ? (
     <div>
       <GameStateInfoContainer>
         <GameStateInfo>Round {currentRound + 1}</GameStateInfo>
