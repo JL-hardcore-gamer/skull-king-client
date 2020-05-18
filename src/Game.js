@@ -22,6 +22,7 @@ const Board = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 `;
 
 const PlayerBoard = styled.div`
@@ -29,7 +30,7 @@ const PlayerBoard = styled.div`
   flex-direction: column;
   width: 200px;
   height: 250px;
-  margin: 0 10px;
+  margin: 5px 10px;
 
   background-color: rgba(22, 22, 22, 0.2);
   border-radius: 5px;
@@ -62,6 +63,7 @@ const PlayerHandContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 `;
 
 const CardContainer = styled.div`
@@ -88,10 +90,8 @@ const GameStatusMessage = styled.div`
   font-size: 20px;
 `;
 
-const GameBet = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 500px;
+const BetButton = styled.button`
+  margin: 0 10px;
 `;
 
 const BloodyMaryChoice = styled.div`
@@ -280,14 +280,6 @@ const Game = () => {
     }
   }, [currentRoom, dispatch, playerHand, players, playersPlayedCard, userName]);
 
-  const regex = /^(?:[1-9]|0[1-9]|10|0)$/;
-  const isCorrectBet =
-    playerBet !== null &&
-    maxBet != null &&
-    playerBet >= 0 &&
-    playerBet <= maxBet &&
-    regex.test(playerBet);
-
   const currentPlayer = players.find((player) => player.id === currentPlayerId);
   const isCurrentPlayer =
     currentPlayer && userName && currentPlayer.name === userName;
@@ -297,6 +289,26 @@ const Game = () => {
     isCurrentPlayerWinner = winners.includes(currentPlayer.id.toString());
     console.log('winners', winners);
     console.log('currentPlayer', currentPlayer);
+  }
+
+  let betButtons = [];
+
+  if (maxBet !== -1) {
+    for (let i = 0; i <= maxBet; ++i) {
+      betButtons = [
+        ...betButtons,
+        <BetButton
+          key={i}
+          className="btn btn-primary"
+          onClick={() => {
+            currentRoom.send('BET', { value: i });
+            setMaxBet(-1);
+          }}
+        >
+          {i}
+        </BetButton>,
+      ];
+    }
   }
 
   // const isCurrentPlayerWinner = currentPlayer.id === winner;
@@ -312,37 +324,7 @@ const Game = () => {
       ) : null}
 
       {maxBet !== -1 ? (
-        <GameStatusMessageContainer>
-          <GameBet className="input-group">
-            <div className="input-group-prepend">
-              <span className="input-group-text">Nombre de plis</span>
-            </div>
-            <input
-              type="number"
-              className="form-control"
-              min="0"
-              max={maxBet}
-              onChange={(e) => {
-                setPlayerBet(parseInt(e.target.value));
-              }}
-            />
-            <div className="input-group-append">
-              <button
-                type="button"
-                className="btn btn-primary"
-                disabled={!isCorrectBet}
-                onClick={() => {
-                  if (playerBet >= 0) {
-                    currentRoom.send('BET', { value: playerBet });
-                    setMaxBet(-1);
-                  }
-                }}
-              >
-                Prêt à Yo-Ho-Ho
-              </button>
-            </div>
-          </GameBet>
-        </GameStatusMessageContainer>
+        <GameStatusMessageContainer>{betButtons}</GameStatusMessageContainer>
       ) : null}
 
       <Board>
